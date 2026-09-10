@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Control de Paquetería</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<style>
+  :root {
+    --paper: #EEEBE1; --paper-alt: #E4E0D2; --ink: #26312F; --ink-soft: #5B6560;
+    --line: #C7C0AC; --rust: #B0402C; --teal: #2F6F5E; --gold: #B98A2E; --navy: #2C4A6E;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Inter', sans-serif; color: var(--ink); background: #d8d3c2; padding: 20px; }
+  .app { background: var(--paper); border: 1px solid var(--line); max-width: 980px; margin: 0 auto; }
+
+  /* ---------- Login ---------- */
+  .login-wrap { max-width: 380px; margin: 80px auto; background: var(--paper); border: 1px solid var(--line); padding: 32px; }
+  .login-wrap h1 { font-family: 'Roboto Slab', serif; font-size: 22px; margin: 0 0 6px; }
+  .login-wrap p { font-size: 13px; color: var(--ink-soft); margin: 0 0 20px; }
+  .login-wrap input { width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 3px; margin-bottom: 10px; font-family: inherit; font-size: 14px; }
+  .login-wrap button { width: 100%; padding: 10px; background: var(--ink); color: var(--paper); border: none; border-radius: 3px; font-size: 14px; cursor: pointer; font-family: inherit; }
+  .login-error { color: var(--rust); font-size: 13px; margin-top: 8px; }
+
+  /* ---------- Header ---------- */
+  .pkg-head { display: flex; justify-content: space-between; align-items: flex-end; padding: 28px 28px 18px; border-bottom: 1px solid var(--line); flex-wrap: wrap; gap: 14px; }
+  .pkg-title { font-family: 'Roboto Slab', serif; font-weight: 700; font-size: 26px; margin: 0; }
+  .pkg-sub { font-size: 13px; color: var(--ink-soft); margin-top: 4px; }
+  .pkg-actions { display: flex; gap: 8px; }
+  .btn { display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; font-weight: 500; padding: 8px 14px; border-radius: 3px; border: 1px solid var(--ink); background: var(--ink); color: var(--paper); cursor: pointer; font-family: inherit; }
+  .btn.secondary { background: transparent; color: var(--ink); }
+  .btn:hover { opacity: .85; }
+  .icon-btn { border: 1px solid var(--line); background: transparent; border-radius: 3px; padding: 6px 8px; cursor: pointer; color: var(--ink-soft); font-size: 13px; }
+  .icon-btn:hover { border-color: var(--ink); color: var(--ink); }
+
+  /* ---------- Stats ---------- */
+  .pkg-stats { display: flex; flex-wrap: wrap; }
+  .stat { flex: 1 1 140px; padding: 16px 20px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .stat:last-child { border-right: none; }
+  .stat-label { font-size: 11px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .04em; }
+  .stat-value { font-family: 'Roboto Slab', serif; font-size: 21px; font-weight: 700; margin-top: 3px; }
+  .pkg-tipos { display: flex; border-bottom: 1px solid var(--line); font-size: 12.5px; flex-wrap: wrap; }
+  .tipo-chip { flex: 1; min-width: 160px; padding: 9px 18px; border-right: 1px solid var(--line); display: flex; align-items: center; gap: 7px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  /* ---------- Toolbar / table ---------- */
+  .toolbar { display: flex; gap: 10px; padding: 16px 28px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .search-wrap { flex: 1; min-width: 180px; }
+  .search-wrap input { width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 3px; font-size: 13.5px; font-family: inherit; }
+  select.tipo-filter { border: 1px solid var(--line); border-radius: 3px; padding: 8px 10px; font-size: 13.5px; font-family: inherit; background: #fff; }
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 780px; }
+  thead th { text-align: left; font-weight: 600; font-size: 11px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .03em; padding: 10px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  tbody td { padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tbody tr:nth-child(even) { background: var(--paper-alt); }
+  .mono { font-family: 'IBM Plex Mono', monospace; font-size: 12px; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .tipo-cell { white-space: nowrap; }
+  .ganancia-pos { color: var(--teal); font-weight: 600; }
+  .row-actions { display: flex; gap: 4px; justify-content: flex-end; }
+  .empty { padding: 40px 28px; text-align: center; color: var(--ink-soft); }
+
+  /* ---------- Panels ---------- */
+  .panel { border-bottom: 1px solid var(--line); padding: 20px 28px; background: #F5F3EA; }
+  .panel h3 { font-family: 'Roboto Slab', serif; font-size: 16px; margin: 0 0 14px; }
+  .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .field label { display: block; font-size: 11.5px; color: var(--ink-soft); margin-bottom: 4px; }
+  .field input, .field select { width: 100%; padding: 8px 9px; border: 1px solid var(--line); border-radius: 3px; font-size: 13.5px; font-family: inherit; background: #fff; }
+  .form-actions { display: flex; gap: 8px; margin-top: 16px; justify-content: flex-end; }
+  .cfg-row { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 10px; align-items: center; margin-bottom: 8px; }
+  .cfg-row input { padding: 7px 9px; border: 1px solid var(--line); border-radius: 3px; font-family: inherit; font-size: 13px; }
+  .cargo-row { display: grid; grid-template-columns: 1.3fr 1fr auto; gap: 10px; align-items: center; margin-bottom: 8px; }
+  .cfg-hint { font-size: 11.5px; color: var(--ink-soft); margin: 12px 0 6px; }
+  .banner { display: flex; align-items: center; gap: 8px; background: #F7E3DD; color: var(--rust); border-bottom: 1px solid var(--line); padding: 10px 28px; font-size: 13px; }
+  .confirm-box { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+
+  @media (max-width: 640px) { .form-grid { grid-template-columns: 1fr; } .pkg-stats { flex-direction: column; } .stat { border-right: none; } }
+</style>
+</head>
+<body>
+
+<div id="login-screen" class="login-wrap">
+  <h1>Control de Paquetería</h1>
+  <p>Inicia sesión para ver tus paquetes.</p>
+  <input id="login-email" type="email" placeholder="Correo" />
+  <input id="login-password" type="password" placeholder="Contraseña" />
+  <button onclick="doLogin()">Entrar</button>
+  <div id="login-error" class="login-error"></div>
+</div>
+
+<div id="app" class="app" style="display:none;"></div>
+
+<script>
+const RATE_TYPES = ["Aéreo Express", "Aéreo Estándar", "Marítimo"];
+const TIPO_COLOR = { "Aéreo Express": "#2F6F5E", "Aéreo Estándar": "#B98A2E", "Marítimo": "#2C4A6E" };
+const DEFAULT_CONFIG = {
+  rates: {
+    "Aéreo Express": { cliente: 8.6, empresa: 5.5 },
+    "Aéreo Estándar": { cliente: 6.2, empresa: 4.2 },
+    "Marítimo": { cliente: 3.2, empresa: 1.85 },
+  },
+  cargos: [{ id: "c1", label: "Seguro", monto: 2.96 }, { id: "c2", label: "Manejo", monto: 2.88 }],
+  tasaCambio: 26.6,
+};
+
+const supa = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+
+let state = { user: null, config: null, packages: [], query: "", filterTipo: "Todos", showForm: false, showConfig: false, form: null, confirmDelete: null, saveError: null };
+
+function money(n) { return "$" + (Number(n) || 0).toFixed(2); }
+function lps(n) { return "L " + (Number(n) || 0).toFixed(2); }
+
+function calc(pkg, config) {
+  const rate = config.rates[pkg.tipo_envio] || { cliente: 0, empresa: 0 };
+  const cargoFijo = config.cargos.reduce((s, c) => s + (Number(c.monto) || 0), 0);
+  const tienePeso = pkg.peso !== "" && pkg.peso !== null && pkg.peso !== undefined && !isNaN(Number(pkg.peso));
+  const peso = tienePeso ? Number(pkg.peso) : 0;
+  const flete = peso * rate.cliente;
+  const costoFlete = peso * rate.empresa;
+  const totalCliente = flete + cargoFijo;
+  const costoEmpresa = costoFlete + cargoFijo;
+  const ganancia = totalCliente - costoEmpresa;
+  return { tienePeso, peso, flete, cargoFijo, totalCliente, costoEmpresa, ganancia, gananciaLps: ganancia * config.tasaCambio };
+}
+
+function emptyForm() {
+  return { id: null, fecha: new Date().toISOString().slice(0, 10), cliente: "", orden: "", tracking: "", descripcion: "", tipo_envio: "Aéreo Express", peso: "" };
+}
+
+async function doLogin() {
+  const email = document.getElementById("login-email").value.trim();
+  const password = document.getElementById("login-password").value;
+  const { data, error } = await supa.auth.signInWithPassword({ email, password });
+  if (error) { document.getElementById("login-error").textContent = "No se pudo iniciar sesión: " + error.message; return; }
+  state.user = data.user;
+  document.getElementById("login-screen").style.display = "none";
+  document.getElementById("app").style.display = "block";
+  await loadData();
+}
+
+async function logout() {
+  await supa.auth.signOut();
+  location.reload();
+}
+
+async function loadData() {
+  let { data: cfgRow } = await supa.from("configuracion").select("datos").eq("user_id", state.user.id).maybeSingle();
+  if (cfgRow && cfgRow.datos) {
+    state.config = cfgRow.datos;
+  } else {
+    state.config = DEFAULT_CONFIG;
+    await supa.from("configuracion").insert({ user_id: state.user.id, datos: DEFAULT_CONFIG });
+  }
+  const { data: pkgs, error } = await supa.from("paquetes").select("*").order("fecha", { ascending: false });
+  state.packages = pkgs || [];
+  if (error) state.saveError = "No se pudieron cargar los paquetes.";
+  render();
+}
+
+async function persistConfig(next) {
+  state.config = next;
+  const { error } = await supa.from("configuracion").update({ datos: next }).eq("user_id", state.user.id);
+  state.saveError = error ? "No se pudo guardar la configuración." : null;
+  render();
+}
+
+async function saveForm() {
+  const f = state.form;
+  const clean = { fecha: f.fecha || null, cliente: f.cliente, orden: f.orden, tracking: f.tracking, descripcion: f.descripcion, tipo_envio: f.tipo_envio, peso: f.peso === "" ? null : Number(f.peso) };
+  let error;
+  if (f.id) {
+    ({ error } = await supa.from("paquetes").update(clean).eq("id", f.id));
+  } else {
+    ({ error } = await supa.from("paquetes").insert({ ...clean, user_id: state.user.id }));
+  }
+  state.saveError = error ? "No se pudo guardar el paquete." : null;
+  state.showForm = false;
+  state.form = null;
+  await loadData();
+}
+
+async function doDelete(id) {
+  const { error } = await supa.from("paquetes").delete().eq("id", id);
+  state.saveError = error ? "No se pudo eliminar." : null;
+  state.confirmDelete = null;
+  await loadData();
+}
+
+function updateRate(tipo, field, value) {
+  const next = { ...state.config, rates: { ...state.config.rates, [tipo]: { ...state.config.rates[tipo], [field]: Number(value) || 0 } } };
+  persistConfig(next);
+}
+function updateCargo(id, field, value) {
+  const next = { ...state.config, cargos: state.config.cargos.map(c => c.id === id ? { ...c, [field]: field === "monto" ? Number(value) || 0 : value } : c) };
+  persistConfig(next);
+}
+function addCargo() {
+  persistConfig({ ...state.config, cargos: [...state.config.cargos, { id: "c" + Date.now(), label: "Nuevo cargo", monto: 0 }] });
+}
+function removeCargo(id) {
+  persistConfig({ ...state.config, cargos: state.config.cargos.filter(c => c.id !== id) });
+}
+function updateTasaCambio(v) { persistConfig({ ...state.config, tasaCambio: Number(v) || 0 }); }
+
+function openNew() { state.form = emptyForm(); state.showForm = true; render(); }
+function openEdit(p) { state.form = { ...p, peso: p.peso === null || p.peso === undefined ? "" : String(p.peso) }; state.showForm = true; render(); }
+function closeForm() { state.showForm = false; state.form = null; render(); }
+function setField(k, v) { state.form[k] = v; }
+
+function getFiltered() {
+  const q = state.query.trim().toLowerCase();
+  return state.packages
+    .filter(p => state.filterTipo === "Todos" ? true : p.tipo_envio === state.filterTipo)
+    .filter(p => !q ? true : [p.cliente, p.orden, p.tracking, p.descripcion].some(v => (v || "").toLowerCase().includes(q)));
+}
+
+function getTotals() {
+  const base = { count: 0, totalCliente: 0, ganancia: 0, gananciaLps: 0 };
+  const porTipo = {}; RATE_TYPES.forEach(t => porTipo[t] = { count: 0, ganancia: 0 });
+  state.packages.forEach(p => {
+    const c = calc(p, state.config);
+    base.count++; base.totalCliente += c.totalCliente; base.ganancia += c.ganancia; base.gananciaLps += c.gananciaLps;
+    if (porTipo[p.tipo_envio]) { porTipo[p.tipo_envio].count++; porTipo[p.tipo_envio].ganancia += c.ganancia; }
+  });
+  return { ...base, porTipo };
+}
+
+function esc(s) { return (s ?? "").toString().replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m])); }
+
+function render() {
+  const t = getTotals();
+  const filtered = getFiltered();
+  const app = document.getElementById("app");
+  app.innerHTML = `
+    <div class="pkg-head">
+      <div>
+        <p class="pkg-title">Control de Paquetería</p>
+        <div class="pkg-sub">Seguimiento de envíos, tarifas y márgenes</div>
+      </div>
+      <div class="pkg-actions">
+        <button class="icon-btn" onclick="logout()">Cerrar sesión</button>
+        <button class="btn secondary" onclick="state.showConfig=!state.showConfig; render()">Tarifas</button>
+        <button class="btn" onclick="openNew()">+ Nuevo paquete</button>
+      </div>
+    </div>
+    ${state.saveError ? `<div class="banner">${esc(state.saveError)}</div>` : ""}
+    <div class="pkg-stats">
+      <div class="stat"><div class="stat-label">Paquetes</div><div class="stat-value">${t.count}</div></div>
+      <div class="stat"><div class="stat-label">Total facturado</div><div class="stat-value">${money(t.totalCliente)}</div></div>
+      <div class="stat"><div class="stat-label">Ganancia</div><div class="stat-value" style="color:var(--teal)">${money(t.ganancia)}</div></div>
+      <div class="stat"><div class="stat-label">Ganancia en Lempiras</div><div class="stat-value">${lps(t.gananciaLps)}</div></div>
+    </div>
+    <div class="pkg-tipos">
+      ${RATE_TYPES.map(tp => `<div class="tipo-chip"><span class="dot" style="background:${TIPO_COLOR[tp]}"></span>${tp}: ${t.porTipo[tp].count} · ${money(t.porTipo[tp].ganancia)}</div>`).join("")}
+    </div>
+    ${state.showConfig ? renderConfig() : ""}
+    ${state.showForm ? renderForm() : ""}
+    <div class="toolbar">
+      <div class="search-wrap"><input placeholder="Buscar por cliente, orden, tracking o descripción" value="${esc(state.query)}" oninput="state.query=this.value; render()" /></div>
+      <select class="tipo-filter" onchange="state.filterTipo=this.value; render()">
+        <option ${state.filterTipo === "Todos" ? "selected" : ""}>Todos</option>
+        ${RATE_TYPES.map(tp => `<option ${state.filterTipo === tp ? "selected" : ""}>${tp}</option>`).join("")}
+      </select>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Fecha</th><th>Cliente</th><th>Orden</th><th>Tracking</th><th>Descripción</th><th>Tipo</th><th class="num">Peso</th><th class="num">Total</th><th class="num">Ganancia</th><th></th></tr></thead>
+        <tbody>
+          ${filtered.map(p => {
+            const c = calc(p, state.config);
+            const tracking = p.tracking ? (p.tracking.length > 16 ? esc(p.tracking.slice(0, 16)) + "…" : esc(p.tracking)) : "—";
+            return `<tr>
+              <td class="mono">${esc(p.fecha) || "—"}</td>
+              <td>${esc(p.cliente) || "—"}</td>
+              <td class="mono">${esc(p.orden) || "—"}</td>
+              <td class="mono" title="${esc(p.tracking)}">${tracking}</td>
+              <td>${esc(p.descripcion) || "—"}</td>
+              <td class="tipo-cell"><span class="dot" style="background:${TIPO_COLOR[p.tipo_envio]};display:inline-block;margin-right:6px;"></span>${esc(p.tipo_envio)}</td>
+              <td class="num">${c.tienePeso ? c.peso.toFixed(2) : "—"}</td>
+              <td class="num">${c.tienePeso ? money(c.totalCliente) : "—"}</td>
+              <td class="num ganancia-pos">${c.tienePeso ? money(c.ganancia) : "—"}</td>
+              <td>
+                ${state.confirmDelete === p.id
+                  ? `<div class="confirm-box">¿Eliminar? <button class="btn secondary" onclick="state.confirmDelete=null; render()">No</button><button class="btn" onclick="doDelete('${p.id}')">Sí</button></div>`
+                  : `<div class="row-actions"><button class="icon-btn" onclick='openEdit(${JSON.stringify(p).replace(/'/g, "&#39;")})'>Editar</button><button class="icon-btn" onclick="state.confirmDelete='${p.id}'; render()">Borrar</button></div>`}
+              </td>
+            </tr>`;
+          }).join("")}
+        </tbody>
+      </table>
+      ${filtered.length === 0 ? `<div class="empty">No hay paquetes que coincidan con la búsqueda.</div>` : ""}
+    </div>
+  `;
+}
+
+function renderConfig() {
+  const cfg = state.config;
+  return `<div class="panel">
+    <h3>Tarifas por tipo de envío ($/lb)</h3>
+    ${RATE_TYPES.map(t => `
+      <div class="cfg-row">
+        <div>${t}</div>
+        <div class="field"><label>Cliente</label><input type="number" step="0.01" value="${cfg.rates[t].cliente}" onchange="updateRate('${t}','cliente',this.value)" /></div>
+        <div class="field"><label>Empresa</label><input type="number" step="0.01" value="${cfg.rates[t].empresa}" onchange="updateRate('${t}','empresa',this.value)" /></div>
+      </div>`).join("")}
+    <div class="cfg-hint">Cargos fijos aplicados a cada paquete</div>
+    ${cfg.cargos.map(c => `
+      <div class="cargo-row">
+        <input value="${esc(c.label)}" onchange="updateCargo('${c.id}','label',this.value)" />
+        <input type="number" step="0.01" value="${c.monto}" onchange="updateCargo('${c.id}','monto',this.value)" />
+        <button class="icon-btn" onclick="removeCargo('${c.id}')">✕</button>
+      </div>`).join("")}
+    <button class="btn secondary" onclick="addCargo()">+ Agregar cargo</button>
+    <div class="cfg-hint">Tasa de cambio (Lempiras por dólar)</div>
+    <div style="max-width:160px;"><input type="number" step="0.01" value="${cfg.tasaCambio}" onchange="updateTasaCambio(this.value)" /></div>
+  </div>`;
+}
+
+function renderForm() {
+  const f = state.form;
+  return `<div class="panel">
+    <h3>${f.id ? "Editar paquete" : "Nuevo paquete"}</h3>
+    <div class="form-grid">
+      <div class="field"><label>Fecha</label><input type="date" value="${esc(f.fecha)}" onchange="setField('fecha',this.value)" /></div>
+      <div class="field"><label>Cliente</label><input value="${esc(f.cliente)}" onchange="setField('cliente',this.value)" /></div>
+      <div class="field"><label>Orden #</label><input value="${esc(f.orden)}" onchange="setField('orden',this.value)" /></div>
+      <div class="field"><label>Tracking #</label><input value="${esc(f.tracking)}" onchange="setField('tracking',this.value)" /></div>
+      <div class="field" style="grid-column:span 2;"><label>Descripción</label><input value="${esc(f.descripcion)}" onchange="setField('descripcion',this.value)" /></div>
+      <div class="field"><label>Tipo de envío</label>
+        <select onchange="setField('tipo_envio',this.value)">
+          ${RATE_TYPES.map(t => `<option ${f.tipo_envio === t ? "selected" : ""}>${t}</option>`).join("")}
+        </select>
+      </div>
+      <div class="field"><label>Peso (lb)</label><input type="number" step="0.01" value="${esc(f.peso)}" onchange="setField('peso',this.value)" placeholder="Opcional" /></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn secondary" onclick="closeForm()">Cancelar</button>
+      <button class="btn" onclick="saveForm()">Guardar</button>
+    </div>
+  </div>`;
+}
+
+// Restaurar sesión si ya había una activa
+supa.auth.getSession().then(({ data }) => {
+  if (data.session) {
+    state.user = data.session.user;
+    document.getElementById("login-screen").style.display = "none";
+    document.getElementById("app").style.display = "block";
+    loadData();
+  }
+});
+</script>
+</body>
+</html>
