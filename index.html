@@ -222,7 +222,8 @@ async function doDeleteCaja(id) {
 }
 
 function getSaldosCaja() {
-  const saldos = { LPS: 0, USD: 0 };
+  const t = getTotals();
+  const saldos = { LPS: t.gananciaLps, USD: t.ganancia };
   state.caja.forEach(m => {
     const signo = m.tipo === "entrada" ? 1 : -1;
     saldos[m.moneda] = (saldos[m.moneda] || 0) + signo * (Number(m.monto) || 0);
@@ -347,10 +348,11 @@ function renderCaja() {
   const f = state.cajaForm;
   return `<div class="panel">
     <h3>Caja chica</h3>
-    <div style="display:flex; gap:24px; margin-bottom:16px;">
+    <div style="display:flex; gap:24px; margin-bottom:4px;">
       <div><div class="stat-label">Saldo disponible (LPS)</div><div class="stat-value">${lps(saldos.LPS)}</div></div>
       <div><div class="stat-label">Saldo disponible (USD)</div><div class="stat-value">${money(saldos.USD)}</div></div>
     </div>
+    <div class="cfg-hint" style="margin-bottom:16px;">Parte de la ganancia acumulada de todos los paquetes, menos lo que ya se ha retirado</div>
 
     ${f ? `
       <div style="background:#fff; border:1px solid var(--line); padding:14px; margin-bottom:16px;">
