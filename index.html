@@ -218,13 +218,15 @@ function getFiltered() {
 }
 
 function getTotals() {
-  const base = { count: 0, totalCliente: 0, ganancia: 0, gananciaLps: 0 };
+  const base = { count: 0, totalCliente: 0, ganancia: 0, gananciaLps: 0, extraLps: 0 };
   const porTipo = {}; RATE_TYPES.forEach(t => porTipo[t] = { count: 0, ganancia: 0 });
   state.packages.forEach(p => {
     const c = calc(p, state.config);
     base.count++; base.totalCliente += c.totalCliente; base.ganancia += c.ganancia; base.gananciaLps += c.gananciaLps;
+    base.extraLps += Number(p.pago_extra_lps) || 0;
     if (porTipo[p.tipo_envio]) { porTipo[p.tipo_envio].count++; porTipo[p.tipo_envio].ganancia += c.ganancia; }
   });
+  base.gananciaLps += base.extraLps;
   return { ...base, porTipo };
 }
 
@@ -251,7 +253,7 @@ function render() {
       <div class="stat"><div class="stat-label">Paquetes</div><div class="stat-value">${t.count}</div></div>
       <div class="stat"><div class="stat-label">Total facturado</div><div class="stat-value">${money(t.totalCliente)}</div></div>
       <div class="stat"><div class="stat-label">Ganancia</div><div class="stat-value" style="color:var(--teal)">${money(t.ganancia)}</div></div>
-      <div class="stat"><div class="stat-label">Ganancia en Lempiras</div><div class="stat-value">${lps(t.gananciaLps)}</div></div>
+      <div class="stat"><div class="stat-label">Ganancia en Lempiras</div><div class="stat-value">${lps(t.gananciaLps)}</div>${t.extraLps ? `<div style="font-size:11px;color:var(--ink-soft);margin-top:2px;">incluye ${lps(t.extraLps)} de pagos OTP</div>` : ""}</div>
     </div>
     <div class="pkg-tipos">
       ${RATE_TYPES.map(tp => `<div class="tipo-chip"><span class="dot" style="background:${TIPO_COLOR[tp]}"></span>${tp}: ${t.porTipo[tp].count} · ${money(t.porTipo[tp].ganancia)}</div>`).join("")}
