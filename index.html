@@ -108,7 +108,7 @@ const DEFAULT_CONFIG = {
 
 const supa = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
 
-let state = { user: null, config: null, packages: [], query: "", filterTipo: "Todos", showForm: false, showConfig: false, form: null, confirmDelete: null, saveError: null };
+let state = { user: null, config: null, packages: [], caja: [], query: "", filterTipo: "Todos", showForm: false, showConfig: false, showCaja: false, cajaForm: null, form: null, confirmDelete: null, confirmDeleteCaja: null, saveError: null };
 
 function money(n) { return "$" + (Number(n) || 0).toFixed(2); }
 function lps(n) { return "L " + (Number(n) || 0).toFixed(2); }
@@ -157,6 +157,9 @@ async function loadData() {
   const { data: pkgs, error } = await supa.from("paquetes").select("*").order("fecha", { ascending: false, nullsFirst: false });
   state.packages = pkgs || [];
   if (error) state.saveError = "No se pudieron cargar los paquetes.";
+  const { data: caja, error: cajaError } = await supa.from("caja_chica").select("*").order("fecha", { ascending: false, nullsFirst: false });
+  state.caja = caja || [];
+  if (cajaError) state.saveError = "No se pudo cargar la caja chica.";
   render();
 }
 
@@ -187,6 +190,44 @@ async function doDelete(id) {
   state.saveError = error ? "No se pudo eliminar." : null;
   state.confirmDelete = null;
   await loadData();
+}
+
+function emptyCajaForm() {
+  return { id: null, fecha: new Date().toISOString().slice(0, 10), tipo: "salida", monto: "", moneda: "LPS", motivo: "" };
+}
+function openNewCaja() { state.cajaForm = emptyCajaForm(); render(); }
+function openEditCaja(m) { state.cajaForm = { ...m, monto: String(m.monto) }; render(); }
+function closeCajaForm() { state.cajaForm = null; render(); }
+function setCajaField(k, v) { state.cajaForm[k] = v; }
+
+async function saveCajaForm() {
+  const f = state.cajaForm;
+  const clean = { fecha: f.fecha || null, tipo: f.tipo, monto: Number(f.monto) || 0, moneda: f.moneda, motivo: f.motivo };
+  let error;
+  if (f.id) {
+    ({ error } = await supa.from("caja_chica").update(clean).eq("id", f.id));
+  } else {
+    ({ error } = await supa.from("caja_chica").insert({ ...clean, user_id: state.user.id }));
+  }
+  state.saveError = error ? "No se pudo guardar el movimiento de caja." : null;
+  state.cajaForm = null;
+  await loadData();
+}
+
+async function doDeleteCaja(id) {
+  const { error } = await supa.from("caja_chica").delete().eq("id", id);
+  state.saveError = error ? "No se pudo eliminar el movimiento." : null;
+  state.confirmDeleteCaja = null;
+  await loadData();
+}
+
+function getSaldosCaja() {
+  const saldos = { LPS: 0, USD: 0 };
+  state.caja.forEach(m => {
+    const signo = m.tipo === "entrada" ? 1 : -1;
+    saldos[m.moneda] = (saldos[m.moneda] || 0) + signo * (Number(m.monto) || 0);
+  });
+  return saldos;
 }
 
 function updateRate(tipo, field, value) {
@@ -244,7 +285,8 @@ function render() {
       </div>
       <div class="pkg-actions">
         <button class="icon-btn" onclick="logout()">Cerrar sesión</button>
-        <button class="btn secondary" onclick="state.showConfig=!state.showConfig; render()">Tarifas</button>
+        <button class="btn secondary" onclick="state.showCaja=!state.showCaja; state.showConfig=false; render()">Caja chica</button>
+        <button class="btn secondary" onclick="state.showConfig=!state.showConfig; state.showCaja=false; render()">Tarifas</button>
         <button class="btn" onclick="openNew()">+ Nuevo paquete</button>
       </div>
     </div>
@@ -259,6 +301,7 @@ function render() {
       ${RATE_TYPES.map(tp => `<div class="tipo-chip"><span class="dot" style="background:${TIPO_COLOR[tp]}"></span>${tp}: ${t.porTipo[tp].count} · ${money(t.porTipo[tp].ganancia)}</div>`).join("")}
     </div>
     ${state.showConfig ? renderConfig() : ""}
+    ${state.showCaja ? renderCaja() : ""}
     ${state.showForm ? renderForm() : ""}
     <div class="toolbar">
       <div class="search-wrap"><input placeholder="Buscar por cliente, orden, tracking o descripción" value="${esc(state.query)}" oninput="state.query=this.value; render()" /></div>
@@ -297,6 +340,63 @@ function render() {
       ${filtered.length === 0 ? `<div class="empty">No hay paquetes que coincidan con la búsqueda.</div>` : ""}
     </div>
   `;
+}
+
+function renderCaja() {
+  const saldos = getSaldosCaja();
+  const f = state.cajaForm;
+  return `<div class="panel">
+    <h3>Caja chica</h3>
+    <div style="display:flex; gap:24px; margin-bottom:16px;">
+      <div><div class="stat-label">Saldo disponible (LPS)</div><div class="stat-value">${lps(saldos.LPS)}</div></div>
+      <div><div class="stat-label">Saldo disponible (USD)</div><div class="stat-value">${money(saldos.USD)}</div></div>
+    </div>
+
+    ${f ? `
+      <div style="background:#fff; border:1px solid var(--line); padding:14px; margin-bottom:16px;">
+        <div class="form-grid">
+          <div class="field"><label>Fecha</label><input type="date" value="${esc(f.fecha)}" onchange="setCajaField('fecha',this.value)" /></div>
+          <div class="field"><label>Tipo</label>
+            <select onchange="setCajaField('tipo',this.value)">
+              <option value="salida" ${f.tipo === "salida" ? "selected" : ""}>Salida (se agarró dinero)</option>
+              <option value="entrada" ${f.tipo === "entrada" ? "selected" : ""}>Entrada (se metió dinero)</option>
+            </select>
+          </div>
+          <div class="field"><label>Moneda</label>
+            <select onchange="setCajaField('moneda',this.value)">
+              <option value="LPS" ${f.moneda === "LPS" ? "selected" : ""}>Lempiras (L)</option>
+              <option value="USD" ${f.moneda === "USD" ? "selected" : ""}>Dólares ($)</option>
+            </select>
+          </div>
+          <div class="field"><label>Monto</label><input type="number" step="0.01" value="${esc(f.monto)}" onchange="setCajaField('monto',this.value)" /></div>
+          <div class="field" style="grid-column:span 2;"><label>¿En qué se usó / de dónde vino?</label><input value="${esc(f.motivo)}" onchange="setCajaField('motivo',this.value)" placeholder="Ej: gasolina, se metieron los $68 de Lineth..." /></div>
+        </div>
+        <div class="form-actions">
+          <button class="btn secondary" onclick="closeCajaForm()">Cancelar</button>
+          <button class="btn" onclick="saveCajaForm()">Guardar</button>
+        </div>
+      </div>
+    ` : `<button class="btn secondary" style="margin-bottom:14px;" onclick="openNewCaja()">+ Registrar movimiento</button>`}
+
+    <table>
+      <thead><tr><th>Fecha</th><th>Tipo</th><th class="num">Monto</th><th>Motivo</th><th></th></tr></thead>
+      <tbody>
+        ${state.caja.map(m => `
+          <tr>
+            <td class="mono">${esc(m.fecha) || "—"}</td>
+            <td style="color:${m.tipo === 'entrada' ? 'var(--teal)' : 'var(--rust)'}">${m.tipo === 'entrada' ? 'Entrada' : 'Salida'}</td>
+            <td class="num">${m.moneda === 'USD' ? money(m.monto) : lps(m.monto)}</td>
+            <td>${esc(m.motivo) || "—"}</td>
+            <td>
+              ${state.confirmDeleteCaja === m.id
+                ? `<div class="confirm-box">¿Eliminar? <button class="btn secondary" onclick="state.confirmDeleteCaja=null; render()">No</button><button class="btn" onclick="doDeleteCaja('${m.id}')">Sí</button></div>`
+                : `<div class="row-actions"><button class="icon-btn" onclick='openEditCaja(${JSON.stringify(m).replace(/'/g, "&#39;")})'>Editar</button><button class="icon-btn" onclick="state.confirmDeleteCaja='${m.id}'; render()">Borrar</button></div>`}
+            </td>
+          </tr>`).join("")}
+      </tbody>
+    </table>
+    ${state.caja.length === 0 ? `<div class="empty">Todavía no hay movimientos registrados.</div>` : ""}
+  </div>`;
 }
 
 function renderConfig() {
