@@ -127,7 +127,7 @@ function calc(pkg, config) {
 }
 
 function emptyForm() {
-  return { id: null, fecha: new Date().toISOString().slice(0, 10), cliente: "", orden: "", tracking: "", descripcion: "", tipo_envio: "Aéreo Express", peso: "" };
+  return { id: null, fecha: new Date().toISOString().slice(0, 10), cliente: "", orden: "", tracking: "", descripcion: "", tipo_envio: "Aéreo Express", peso: "", nota_pago: "" };
 }
 
 async function doLogin() {
@@ -169,7 +169,7 @@ async function persistConfig(next) {
 
 async function saveForm() {
   const f = state.form;
-  const clean = { fecha: f.fecha || null, cliente: f.cliente, orden: f.orden, tracking: f.tracking, descripcion: f.descripcion, tipo_envio: f.tipo_envio, peso: f.peso === "" ? null : Number(f.peso) };
+  const clean = { fecha: f.fecha || null, cliente: f.cliente, orden: f.orden, tracking: f.tracking, descripcion: f.descripcion, tipo_envio: f.tipo_envio, peso: f.peso === "" ? null : Number(f.peso), nota_pago: f.nota_pago || null };
   let error;
   if (f.id) {
     ({ error } = await supa.from("paquetes").update(clean).eq("id", f.id));
@@ -206,7 +206,7 @@ function removeCargo(id) {
 function updateTasaCambio(v) { persistConfig({ ...state.config, tasaCambio: Number(v) || 0 }); }
 
 function openNew() { state.form = emptyForm(); state.showForm = true; render(); }
-function openEdit(p) { state.form = { ...p, peso: p.peso === null || p.peso === undefined ? "" : String(p.peso) }; state.showForm = true; render(); }
+function openEdit(p) { state.form = { ...p, peso: p.peso === null || p.peso === undefined ? "" : String(p.peso), nota_pago: p.nota_pago || "" }; state.showForm = true; render(); }
 function closeForm() { state.showForm = false; state.form = null; render(); }
 function setField(k, v) { state.form[k] = v; }
 
@@ -267,7 +267,7 @@ function render() {
     </div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Fecha</th><th>Cliente</th><th>Orden</th><th>Tracking</th><th>Descripción</th><th>Tipo</th><th class="num">Peso</th><th class="num">Total</th><th class="num">Ganancia</th><th></th></tr></thead>
+        <thead><tr><th>Fecha</th><th>Cliente</th><th>Orden</th><th>Tracking</th><th>Descripción</th><th>Tipo</th><th class="num">Peso</th><th class="num">Total</th><th class="num">Ganancia</th><th>Pago</th><th></th></tr></thead>
         <tbody>
           ${filtered.map(p => {
             const c = calc(p, state.config);
@@ -282,6 +282,7 @@ function render() {
               <td class="num">${c.tienePeso ? c.peso.toFixed(2) : "—"}</td>
               <td class="num">${c.tienePeso ? money(c.totalCliente) : "—"}</td>
               <td class="num ganancia-pos">${c.tienePeso ? money(c.ganancia) : "—"}</td>
+              <td>${p.nota_pago ? `<span style="color:var(--rust); font-size:12px;">${esc(p.nota_pago)}</span>` : ""}</td>
               <td>
                 ${state.confirmDelete === p.id
                   ? `<div class="confirm-box">¿Eliminar? <button class="btn secondary" onclick="state.confirmDelete=null; render()">No</button><button class="btn" onclick="doDelete('${p.id}')">Sí</button></div>`
@@ -335,6 +336,7 @@ function renderForm() {
         </select>
       </div>
       <div class="field"><label>Peso (lb)</label><input type="number" step="0.01" value="${esc(f.peso)}" onchange="setField('peso',this.value)" placeholder="Opcional" /></div>
+      <div class="field" style="grid-column:span 2;"><label>Nota de pago</label><input value="${esc(f.nota_pago)}" onchange="setField('nota_pago',this.value)" placeholder="Ej: No se pagó, Pago OTP..." /></div>
     </div>
     <div class="form-actions">
       <button class="btn secondary" onclick="closeForm()">Cancelar</button>
