@@ -154,7 +154,7 @@ async function loadData() {
     state.config = DEFAULT_CONFIG;
     await supa.from("configuracion").insert({ user_id: state.user.id, datos: DEFAULT_CONFIG });
   }
-  const { data: pkgs, error } = await supa.from("paquetes").select("*").order("fecha", { ascending: false });
+  const { data: pkgs, error } = await supa.from("paquetes").select("*").order("fecha", { ascending: false, nullsFirst: false });
   state.packages = pkgs || [];
   if (error) state.saveError = "No se pudieron cargar los paquetes.";
   render();
