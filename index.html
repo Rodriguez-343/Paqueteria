@@ -15,7 +15,7 @@
   }
   * { box-sizing: border-box; }
   body { margin: 0; font-family: 'Inter', sans-serif; color: var(--ink); background: #d8d3c2; padding: 20px; }
-  .app { background: var(--paper); border: 1px solid var(--line); max-width: 980px; margin: 0 auto; }
+  .app { max-width: 1080px; margin: 0 auto; }
 
   /* ---------- Login ---------- */
   .login-wrap { max-width: 380px; margin: 80px auto; background: var(--paper); border: 1px solid var(--line); padding: 32px; }
@@ -25,34 +25,45 @@
   .login-wrap button { width: 100%; padding: 10px; background: var(--ink); color: var(--paper); border: none; border-radius: 3px; font-size: 14px; cursor: pointer; font-family: inherit; }
   .login-error { color: var(--rust); font-size: 13px; margin-top: 8px; }
 
-  /* ---------- Header ---------- */
-  .pkg-head { display: flex; justify-content: space-between; align-items: flex-end; padding: 28px 28px 18px; border-bottom: 1px solid var(--line); flex-wrap: wrap; gap: 14px; }
+  /* ---------- Header + Nav ---------- */
+  .pkg-head { display: flex; justify-content: space-between; align-items: flex-end; padding: 6px 2px 18px; flex-wrap: wrap; gap: 14px; }
   .pkg-title { font-family: 'Roboto Slab', serif; font-weight: 700; font-size: 26px; margin: 0; }
   .pkg-sub { font-size: 13px; color: var(--ink-soft); margin-top: 4px; }
-  .pkg-actions { display: flex; gap: 8px; }
-  .btn { display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; font-weight: 500; padding: 8px 14px; border-radius: 3px; border: 1px solid var(--ink); background: var(--ink); color: var(--paper); cursor: pointer; font-family: inherit; }
-  .btn.secondary { background: transparent; color: var(--ink); }
-  .btn:hover { opacity: .85; }
-  .icon-btn { border: 1px solid var(--line); background: transparent; border-radius: 3px; padding: 6px 8px; cursor: pointer; color: var(--ink-soft); font-size: 13px; }
+  .icon-btn { border: 1px solid var(--line); background: transparent; border-radius: 3px; padding: 6px 10px; cursor: pointer; color: var(--ink-soft); font-size: 13px; font-family: inherit; }
   .icon-btn:hover { border-color: var(--ink); color: var(--ink); }
 
+  .nav { display: flex; gap: 4px; padding: 10px 2px; margin-bottom: 20px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .nav button { background: transparent; border: 1px solid transparent; padding: 8px 14px; border-radius: 3px; font-size: 13.5px; font-family: inherit; cursor: pointer; color: var(--ink-soft); font-weight: 500; }
+  .nav button.active { background: var(--ink); color: var(--paper); }
+  .nav button:hover:not(.active) { border-color: var(--line); color: var(--ink); }
+
+  .card { background: var(--paper); border: 1px solid var(--line); padding: 22px; margin-bottom: 20px; }
+  .card h3 { font-family: 'Roboto Slab', serif; font-size: 17px; margin: 0 0 16px; }
+  .card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; gap: 10px; flex-wrap: wrap; }
+  .card-head h3 { margin: 0; }
+
   /* ---------- Stats ---------- */
-  .pkg-stats { display: flex; flex-wrap: wrap; }
-  .stat { flex: 1 1 140px; padding: 16px 20px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .pkg-stats { display: flex; flex-wrap: wrap; border: 1px solid var(--line); background: var(--paper); margin-bottom: 16px; }
+  .stat { flex: 1 1 160px; padding: 18px 22px; border-right: 1px solid var(--line); }
   .stat:last-child { border-right: none; }
   .stat-label { font-size: 11px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .04em; }
-  .stat-value { font-family: 'Roboto Slab', serif; font-size: 21px; font-weight: 700; margin-top: 3px; }
-  .pkg-tipos { display: flex; border-bottom: 1px solid var(--line); font-size: 12.5px; flex-wrap: wrap; }
-  .tipo-chip { flex: 1; min-width: 160px; padding: 9px 18px; border-right: 1px solid var(--line); display: flex; align-items: center; gap: 7px; }
-  .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .stat-value { font-family: 'Roboto Slab', serif; font-size: 22px; font-weight: 700; margin-top: 3px; }
+  .pkg-tipos { display: flex; border: 1px solid var(--line); border-top: none; font-size: 12.5px; flex-wrap: wrap; margin-bottom: 20px; background: var(--paper); }
+  .tipo-chip { flex: 1; min-width: 170px; padding: 10px 22px; border-right: 1px solid var(--line); display: flex; align-items: center; gap: 7px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  /* ---------- Buttons ---------- */
+  .btn { display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; font-weight: 500; padding: 9px 16px; border-radius: 3px; border: 1px solid var(--ink); background: var(--ink); color: var(--paper); cursor: pointer; font-family: inherit; }
+  .btn.secondary { background: transparent; color: var(--ink); }
+  .btn:hover { opacity: .85; }
 
   /* ---------- Toolbar / table ---------- */
-  .toolbar { display: flex; gap: 10px; padding: 16px 28px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .toolbar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
   .search-wrap { flex: 1; min-width: 180px; }
-  .search-wrap input { width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 3px; font-size: 13.5px; font-family: inherit; }
-  select.tipo-filter { border: 1px solid var(--line); border-radius: 3px; padding: 8px 10px; font-size: 13.5px; font-family: inherit; background: #fff; }
+  .search-wrap input { width: 100%; padding: 9px 11px; border: 1px solid var(--line); border-radius: 3px; font-size: 13.5px; font-family: inherit; background:#fff; }
+  select.tipo-filter { border: 1px solid var(--line); border-radius: 3px; padding: 9px 11px; font-size: 13.5px; font-family: inherit; background: #fff; }
   .table-wrap { overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 780px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
   thead th { text-align: left; font-weight: 600; font-size: 11px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .03em; padding: 10px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
   tbody td { padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
   tbody tr:nth-child(even) { background: var(--paper-alt); }
@@ -61,11 +72,10 @@
   .tipo-cell { white-space: nowrap; }
   .ganancia-pos { color: var(--teal); font-weight: 600; }
   .row-actions { display: flex; gap: 4px; justify-content: flex-end; }
-  .empty { padding: 40px 28px; text-align: center; color: var(--ink-soft); }
+  .empty { padding: 34px; text-align: center; color: var(--ink-soft); }
 
-  /* ---------- Panels ---------- */
-  .panel { border-bottom: 1px solid var(--line); padding: 20px 28px; background: #F5F3EA; }
-  .panel h3 { font-family: 'Roboto Slab', serif; font-size: 16px; margin: 0 0 14px; }
+  /* ---------- Forms ---------- */
+  .subcard { background: #fff; border: 1px solid var(--line); padding: 18px; margin-bottom: 18px; }
   .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
   .field label { display: block; font-size: 11.5px; color: var(--ink-soft); margin-bottom: 4px; }
   .field input, .field select { width: 100%; padding: 8px 9px; border: 1px solid var(--line); border-radius: 3px; font-size: 13.5px; font-family: inherit; background: #fff; }
@@ -73,12 +83,12 @@
   .cfg-row { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 10px; align-items: center; margin-bottom: 8px; }
   .cfg-row input { padding: 7px 9px; border: 1px solid var(--line); border-radius: 3px; font-family: inherit; font-size: 13px; }
   .cargo-row { display: grid; grid-template-columns: 1.3fr 1fr auto; gap: 10px; align-items: center; margin-bottom: 8px; }
-  .cfg-hint { font-size: 11.5px; color: var(--ink-soft); margin: 12px 0 6px; }
-  .banner { display: flex; align-items: center; gap: 8px; background: #F7E3DD; color: var(--rust); border-bottom: 1px solid var(--line); padding: 10px 28px; font-size: 13px; }
+  .cfg-hint { font-size: 11.5px; color: var(--ink-soft); margin: 14px 0 8px; }
+  .banner { display: flex; align-items: center; gap: 8px; background: #F7E3DD; color: var(--rust); border: 1px solid var(--line); padding: 10px 16px; font-size: 13px; margin-bottom: 16px; }
   .confirm-box { display: flex; align-items: center; gap: 8px; font-size: 12px; }
 
   /* ---------- Facturación ---------- */
-  .fac-check-row { display:flex; align-items:center; gap:10px; padding:6px 0; border-bottom:1px solid var(--line); font-size:13px; }
+  .fac-check-row { display:flex; align-items:center; gap:10px; padding:7px 0; border-bottom:1px solid var(--line); font-size:13px; }
   .fac-preview { background:#fff; border:1px solid var(--line); padding:18px; margin-top:14px; font-size:13px; }
   .fac-preview table { width:100%; margin:10px 0; }
   .invoice-print { background:#fff; border:1px solid var(--line); padding:26px; font-family:'Inter',sans-serif; color:#222; }
@@ -86,6 +96,7 @@
   .invoice-print table { width:100%; border-collapse:collapse; margin:14px 0; font-size:13px; }
   .invoice-print th, .invoice-print td { border-bottom:1px solid #ddd; padding:6px 8px; text-align:left; }
   .invoice-print .num { text-align:right; }
+  .pill { display:inline-block; padding:2px 9px; border-radius:2px; font-size:11px; font-weight:600; background:#DCEFE9; color:var(--teal); }
   @media print {
     body * { visibility:hidden; }
     #invoice-area, #invoice-area * { visibility:visible; }
@@ -93,7 +104,7 @@
     .no-print { display:none !important; }
   }
 
-  @media (max-width: 640px) { .form-grid { grid-template-columns: 1fr; } .pkg-stats { flex-direction: column; } .stat { border-right: none; } }
+  @media (max-width: 640px) { .form-grid { grid-template-columns: 1fr; } .stat { flex-basis: 100%; border-right: none; } }
 </style>
 </head>
 <body>
@@ -124,10 +135,15 @@ const DEFAULT_CONFIG = {
 
 const supa = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
 
-let state = { user: null, config: null, packages: [], caja: [], empresa: null, facturas: [], query: "", filterTipo: "Todos", showForm: false, showConfig: false, showCaja: false, showFacturas: false, cajaForm: null, form: null, confirmDelete: null, confirmDeleteCaja: null, saveError: null, facturaBuilder: null, facturaVista: null, showEmpresaForm: false };
+let state = {
+  user: null, view: "resumen", config: null, packages: [], caja: [], empresa: null, facturas: [],
+  query: "", filterTipo: "Todos", form: null, cajaForm: null, facturaBuilder: null, facturaVista: null,
+  showEmpresaForm: false, confirmDelete: null, confirmDeleteCaja: null, saveError: null,
+};
 
 function money(n) { return "$" + (Number(n) || 0).toFixed(2); }
 function lps(n) { return "L " + (Number(n) || 0).toFixed(2); }
+function esc(s) { return (s ?? "").toString().replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m])); }
 
 function calc(pkg, config) {
   const rate = config.rates[pkg.tipo_envio] || { cliente: 0, empresa: 0 };
@@ -146,6 +162,8 @@ function emptyForm() {
   return { id: null, fecha: new Date().toISOString().slice(0, 10), cliente: "", orden: "", tracking: "", descripcion: "", tipo_envio: "Aéreo Express", peso: "", nota_pago: "" };
 }
 
+function setView(v) { state.view = v; render(); }
+
 async function doLogin() {
   const email = document.getElementById("login-email").value.trim();
   const password = document.getElementById("login-password").value;
@@ -156,31 +174,25 @@ async function doLogin() {
   document.getElementById("app").style.display = "block";
   await loadData();
 }
-
-async function logout() {
-  await supa.auth.signOut();
-  location.reload();
-}
+async function logout() { await supa.auth.signOut(); location.reload(); }
 
 async function loadData() {
   let { data: cfgRow } = await supa.from("configuracion").select("datos").eq("user_id", state.user.id).maybeSingle();
-  if (cfgRow && cfgRow.datos) {
-    state.config = cfgRow.datos;
-  } else {
-    state.config = DEFAULT_CONFIG;
-    await supa.from("configuracion").insert({ user_id: state.user.id, datos: DEFAULT_CONFIG });
-  }
+  if (cfgRow && cfgRow.datos) state.config = cfgRow.datos;
+  else { state.config = DEFAULT_CONFIG; await supa.from("configuracion").insert({ user_id: state.user.id, datos: DEFAULT_CONFIG }); }
+
   const { data: pkgs, error } = await supa.from("paquetes").select("*").order("fecha", { ascending: false, nullsFirst: false });
   state.packages = pkgs || [];
   if (error) state.saveError = "No se pudieron cargar los paquetes.";
+
   const { data: caja, error: cajaError } = await supa.from("caja_chica").select("*").order("fecha", { ascending: false, nullsFirst: false });
   state.caja = caja || [];
   if (cajaError) state.saveError = "No se pudo cargar la caja chica.";
 
   let { data: empresaRow } = await supa.from("empresa_config").select("*").eq("user_id", state.user.id).maybeSingle();
-  state.empresa = empresaRow || { nombre:"", direccion:"", ciudad:"", facebook:"", telefonos:"", rtn:"", asesora:"", correo:"", cuentas_bancarias:[], siguiente_numero:1 };
+  state.empresa = empresaRow || { nombre: "", direccion: "", ciudad: "", facebook: "", telefonos: "", rtn: "", asesora: "", correo: "", cuentas_bancarias: [], siguiente_numero: 1 };
 
-  const { data: facturas } = await supa.from("facturas_paqueteria").select("*").order("numero", { ascending:false });
+  const { data: facturas } = await supa.from("facturas_paqueteria").select("*").order("numero", { ascending: false });
   state.facturas = facturas || [];
 
   render();
@@ -197,53 +209,64 @@ async function saveForm() {
   const f = state.form;
   const clean = { fecha: f.fecha || null, cliente: f.cliente, orden: f.orden, tracking: f.tracking, descripcion: f.descripcion, tipo_envio: f.tipo_envio, peso: f.peso === "" ? null : Number(f.peso), nota_pago: f.nota_pago || null };
   let error;
-  if (f.id) {
-    ({ error } = await supa.from("paquetes").update(clean).eq("id", f.id));
-  } else {
-    ({ error } = await supa.from("paquetes").insert({ ...clean, user_id: state.user.id }));
-  }
+  if (f.id) ({ error } = await supa.from("paquetes").update(clean).eq("id", f.id));
+  else ({ error } = await supa.from("paquetes").insert({ ...clean, user_id: state.user.id }));
   state.saveError = error ? "No se pudo guardar el paquete." : null;
-  state.showForm = false;
   state.form = null;
   await loadData();
 }
-
 async function doDelete(id) {
   const { error } = await supa.from("paquetes").delete().eq("id", id);
   state.saveError = error ? "No se pudo eliminar." : null;
   state.confirmDelete = null;
   await loadData();
 }
+function openNew() { state.form = emptyForm(); render(); }
+function openEdit(p) { state.form = { ...p, peso: p.peso === null || p.peso === undefined ? "" : String(p.peso), nota_pago: p.nota_pago || "" }; render(); }
+function closeForm() { state.form = null; render(); }
+function setField(k, v) { state.form[k] = v; }
 
-function emptyCajaForm() {
-  return { id: null, fecha: new Date().toISOString().slice(0, 10), tipo: "salida", monto: "", moneda: "LPS", motivo: "" };
+function getFiltered() {
+  const q = state.query.trim().toLowerCase();
+  return state.packages
+    .filter(p => state.filterTipo === "Todos" ? true : p.tipo_envio === state.filterTipo)
+    .filter(p => !q ? true : [p.cliente, p.orden, p.tracking, p.descripcion].some(v => (v || "").toLowerCase().includes(q)));
 }
+function getTotals() {
+  const base = { count: 0, totalCliente: 0, ganancia: 0, gananciaLps: 0, extraLps: 0 };
+  const porTipo = {}; RATE_TYPES.forEach(t => porTipo[t] = { count: 0, ganancia: 0 });
+  state.packages.forEach(p => {
+    const c = calc(p, state.config);
+    base.count++; base.totalCliente += c.totalCliente; base.ganancia += c.ganancia; base.gananciaLps += c.gananciaLps;
+    base.extraLps += Number(p.pago_extra_lps) || 0;
+    if (porTipo[p.tipo_envio]) { porTipo[p.tipo_envio].count++; porTipo[p.tipo_envio].ganancia += c.ganancia; }
+  });
+  base.gananciaLps += base.extraLps;
+  return { ...base, porTipo };
+}
+
+// ---------- CAJA CHICA ----------
+function emptyCajaForm() { return { id: null, fecha: new Date().toISOString().slice(0, 10), tipo: "salida", monto: "", moneda: "LPS", motivo: "" }; }
 function openNewCaja() { state.cajaForm = emptyCajaForm(); render(); }
 function openEditCaja(m) { state.cajaForm = { ...m, monto: String(m.monto) }; render(); }
 function closeCajaForm() { state.cajaForm = null; render(); }
 function setCajaField(k, v) { state.cajaForm[k] = v; }
-
 async function saveCajaForm() {
   const f = state.cajaForm;
   const clean = { fecha: f.fecha || null, tipo: f.tipo, monto: Number(f.monto) || 0, moneda: f.moneda, motivo: f.motivo };
   let error;
-  if (f.id) {
-    ({ error } = await supa.from("caja_chica").update(clean).eq("id", f.id));
-  } else {
-    ({ error } = await supa.from("caja_chica").insert({ ...clean, user_id: state.user.id }));
-  }
+  if (f.id) ({ error } = await supa.from("caja_chica").update(clean).eq("id", f.id));
+  else ({ error } = await supa.from("caja_chica").insert({ ...clean, user_id: state.user.id }));
   state.saveError = error ? "No se pudo guardar el movimiento de caja." : null;
   state.cajaForm = null;
   await loadData();
 }
-
 async function doDeleteCaja(id) {
   const { error } = await supa.from("caja_chica").delete().eq("id", id);
   state.saveError = error ? "No se pudo eliminar el movimiento." : null;
   state.confirmDeleteCaja = null;
   await loadData();
 }
-
 function getSaldosCaja() {
   const t = getTotals();
   const saldos = { LPS: t.gananciaLps, USD: t.ganancia };
@@ -254,6 +277,7 @@ function getSaldosCaja() {
   return saldos;
 }
 
+// ---------- TARIFAS ----------
 function updateRate(tipo, field, value) {
   const next = { ...state.config, rates: { ...state.config.rates, [tipo]: { ...state.config.rates[tipo], [field]: Number(value) || 0 } } };
   persistConfig(next);
@@ -262,18 +286,9 @@ function updateCargo(id, field, value) {
   const next = { ...state.config, cargos: state.config.cargos.map(c => c.id === id ? { ...c, [field]: field === "monto" ? Number(value) || 0 : value } : c) };
   persistConfig(next);
 }
-function addCargo() {
-  persistConfig({ ...state.config, cargos: [...state.config.cargos, { id: "c" + Date.now(), label: "Nuevo cargo", monto: 0 }] });
-}
-function removeCargo(id) {
-  persistConfig({ ...state.config, cargos: state.config.cargos.filter(c => c.id !== id) });
-}
+function addCargo() { persistConfig({ ...state.config, cargos: [...state.config.cargos, { id: "c" + Date.now(), label: "Nuevo cargo", monto: 0 }] }); }
+function removeCargo(id) { persistConfig({ ...state.config, cargos: state.config.cargos.filter(c => c.id !== id) }); }
 function updateTasaCambio(v) { persistConfig({ ...state.config, tasaCambio: Number(v) || 0 }); }
-
-function openNew() { state.form = emptyForm(); state.showForm = true; render(); }
-function openEdit(p) { state.form = { ...p, peso: p.peso === null || p.peso === undefined ? "" : String(p.peso), nota_pago: p.nota_pago || "" }; state.showForm = true; render(); }
-function closeForm() { state.showForm = false; state.form = null; render(); }
-function setField(k, v) { state.form[k] = v; }
 
 // ---------- FACTURACIÓN ----------
 function clientesPendientes() {
@@ -284,10 +299,7 @@ function clientesPendientes() {
 function paquetesPendientesDe(cliente) {
   return state.packages.filter(p => p.cliente === cliente && !p.factura_id && p.peso !== null && p.peso !== undefined && p.peso !== "");
 }
-function openFacturaBuilder() {
-  state.facturaBuilder = { cliente: "", seleccionados: {}, diasValidez: 8, impuestoPct: 0, descuento: 0 };
-  render();
-}
+function openFacturaBuilder() { state.facturaBuilder = { cliente: "", seleccionados: {}, diasValidez: 8, impuestoPct: 0, descuento: 0 }; render(); }
 function closeFacturaBuilder() { state.facturaBuilder = null; render(); }
 function setFacturaClienteSel(cliente) {
   state.facturaBuilder.cliente = cliente;
@@ -295,12 +307,8 @@ function setFacturaClienteSel(cliente) {
   paquetesPendientesDe(cliente).forEach(p => state.facturaBuilder.seleccionados[p.id] = true);
   render();
 }
-function toggleFacturaPaquete(id) {
-  state.facturaBuilder.seleccionados[id] = !state.facturaBuilder.seleccionados[id];
-  render();
-}
+function toggleFacturaPaquete(id) { state.facturaBuilder.seleccionados[id] = !state.facturaBuilder.seleccionados[id]; render(); }
 function setFacturaBuilderField(k, v) { state.facturaBuilder[k] = v; render(); }
-
 function calcFacturaPreview() {
   const fb = state.facturaBuilder;
   const seleccionados = paquetesPendientesDe(fb.cliente).filter(p => fb.seleccionados[p.id]);
@@ -325,7 +333,6 @@ function calcFacturaPreview() {
   const total = subtotal + totalImpuesto - (Number(fb.descuento) || 0);
   return { seleccionados, items, subtotal, totalImpuesto, total };
 }
-
 async function guardarFactura() {
   const fb = state.facturaBuilder;
   const preview = calcFacturaPreview();
@@ -345,11 +352,9 @@ async function guardarFactura() {
   state.facturaBuilder = null;
   await loadData();
 }
-
 function verFactura(id) { state.facturaVista = state.facturas.find(f => f.id === id); render(); }
 function cerrarVistaFactura() { state.facturaVista = null; render(); }
 function imprimirFactura() { window.print(); }
-
 function setEmpresaField(k, v) { state.empresa[k] = v; }
 function setEmpresaCuenta(i, k, v) { state.empresa.cuentas_bancarias[i][k] = v; }
 function addEmpresaCuenta() { state.empresa.cuentas_bancarias.push({ banco: "", cuenta: "" }); render(); }
@@ -364,11 +369,186 @@ async function guardarEmpresa() {
   await loadData();
 }
 
+// ============ RENDER: RESUMEN ============
+function renderResumen() {
+  const t = getTotals();
+  return `
+    <div class="pkg-stats">
+      <div class="stat"><div class="stat-label">Paquetes</div><div class="stat-value">${t.count}</div></div>
+      <div class="stat"><div class="stat-label">Total facturado</div><div class="stat-value">${money(t.totalCliente)}</div></div>
+      <div class="stat"><div class="stat-label">Ganancia</div><div class="stat-value" style="color:var(--teal)">${money(t.ganancia)}</div></div>
+      <div class="stat"><div class="stat-label">Ganancia en Lempiras</div><div class="stat-value">${lps(t.gananciaLps)}</div>${t.extraLps ? `<div style="font-size:11px;color:var(--ink-soft);margin-top:2px;">incluye ${lps(t.extraLps)} de pagos OTP</div>` : ""}</div>
+    </div>
+    <div class="pkg-tipos">
+      ${RATE_TYPES.map(tp => `<div class="tipo-chip"><span class="dot" style="background:${TIPO_COLOR[tp]}"></span>${tp}: ${t.porTipo[tp].count} · ${money(t.porTipo[tp].ganancia)}</div>`).join("")}
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>Últimos paquetes</h3><button class="btn secondary" onclick="setView('paquetes')">Ver todos</button></div>
+      ${renderPaquetesTable(state.packages.slice(0, 6))}
+    </div>
+  `;
+}
+
+// ============ RENDER: PAQUETES ============
+function renderPaquetesTable(list) {
+  return `<div class="table-wrap">
+    <table>
+      <thead><tr><th>Fecha</th><th>Cliente</th><th>Orden</th><th>Tracking</th><th>Descripción</th><th>Tipo</th><th class="num">Peso</th><th class="num">Total</th><th class="num">Ganancia</th><th>Pago</th><th></th></tr></thead>
+      <tbody>
+        ${list.map(p => {
+          const c = calc(p, state.config);
+          const tracking = p.tracking ? (p.tracking.length > 16 ? esc(p.tracking.slice(0, 16)) + "…" : esc(p.tracking)) : "—";
+          return `<tr>
+            <td class="mono">${esc(p.fecha) || "—"}</td>
+            <td>${esc(p.cliente) || "—"}</td>
+            <td class="mono">${esc(p.orden) || "—"}</td>
+            <td class="mono" title="${esc(p.tracking)}">${tracking}</td>
+            <td>${esc(p.descripcion) || "—"}</td>
+            <td class="tipo-cell"><span class="dot" style="background:${TIPO_COLOR[p.tipo_envio]};display:inline-block;margin-right:6px;"></span>${esc(p.tipo_envio)}</td>
+            <td class="num">${c.tienePeso ? c.peso.toFixed(2) : "—"}</td>
+            <td class="num">${c.tienePeso ? money(c.totalCliente) : "—"}</td>
+            <td class="num ganancia-pos">${c.tienePeso ? money(c.ganancia) : "—"}</td>
+            <td>${p.nota_pago ? `<span style="color:var(--rust); font-size:12px;">${esc(p.nota_pago)}</span>` : ""}</td>
+            <td>
+              ${state.confirmDelete === p.id
+                ? `<div class="confirm-box">¿Eliminar? <button class="btn secondary" onclick="state.confirmDelete=null; render()">No</button><button class="btn" onclick="doDelete('${p.id}')">Sí</button></div>`
+                : `<div class="row-actions"><button class="icon-btn" onclick='openEdit(${JSON.stringify(p).replace(/'/g, "&#39;")})'>Editar</button><button class="icon-btn" onclick="state.confirmDelete='${p.id}'; render()">Borrar</button></div>`}
+            </td>
+          </tr>`;
+        }).join("")}
+      </tbody>
+    </table>
+    ${list.length === 0 ? `<div class="empty">No hay paquetes que coincidan.</div>` : ""}
+  </div>`;
+}
+function renderForm() {
+  const f = state.form;
+  return `<div class="subcard">
+    <h3 style="font-size:14px; margin-bottom:12px;">${f.id ? "Editar paquete" : "Nuevo paquete"}</h3>
+    <div class="form-grid">
+      <div class="field"><label>Fecha</label><input type="date" value="${esc(f.fecha)}" onchange="setField('fecha',this.value)" /></div>
+      <div class="field"><label>Cliente</label><input value="${esc(f.cliente)}" onchange="setField('cliente',this.value)" /></div>
+      <div class="field"><label>Orden #</label><input value="${esc(f.orden)}" onchange="setField('orden',this.value)" /></div>
+      <div class="field"><label>Tracking #</label><input value="${esc(f.tracking)}" onchange="setField('tracking',this.value)" /></div>
+      <div class="field" style="grid-column:span 2;"><label>Descripción</label><input value="${esc(f.descripcion)}" onchange="setField('descripcion',this.value)" /></div>
+      <div class="field"><label>Tipo de envío</label>
+        <select onchange="setField('tipo_envio',this.value)">${RATE_TYPES.map(t => `<option ${f.tipo_envio === t ? "selected" : ""}>${t}</option>`).join("")}</select>
+      </div>
+      <div class="field"><label>Peso (lb)</label><input type="number" step="0.01" value="${esc(f.peso)}" onchange="setField('peso',this.value)" placeholder="Opcional" /></div>
+      <div class="field" style="grid-column:span 2;"><label>Nota de pago</label><input value="${esc(f.nota_pago)}" onchange="setField('nota_pago',this.value)" placeholder="Ej: No se pagó, Pago OTP..." /></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn secondary" onclick="closeForm()">Cancelar</button>
+      <button class="btn" onclick="saveForm()">Guardar</button>
+    </div>
+  </div>`;
+}
+function renderPaquetes() {
+  const filtered = getFiltered();
+  return `<div class="card">
+    <div class="card-head">
+      <h3>Paquetes</h3>
+      ${!state.form ? `<button class="btn" onclick="openNew()">+ Nuevo paquete</button>` : ""}
+    </div>
+    ${state.form ? renderForm() : ""}
+    <div class="toolbar">
+      <div class="search-wrap"><input placeholder="Buscar por cliente, orden, tracking o descripción" value="${esc(state.query)}" oninput="state.query=this.value; render()" /></div>
+      <select class="tipo-filter" onchange="state.filterTipo=this.value; render()">
+        <option ${state.filterTipo === "Todos" ? "selected" : ""}>Todos</option>
+        ${RATE_TYPES.map(tp => `<option ${state.filterTipo === tp ? "selected" : ""}>${tp}</option>`).join("")}
+      </select>
+    </div>
+    ${renderPaquetesTable(filtered)}
+  </div>`;
+}
+
+// ============ RENDER: CAJA CHICA ============
+function renderCaja() {
+  const saldos = getSaldosCaja();
+  const f = state.cajaForm;
+  return `<div class="card">
+    <h3>Caja chica</h3>
+    <div style="display:flex; gap:24px; margin-bottom:4px;">
+      <div><div class="stat-label">Saldo disponible (LPS)</div><div class="stat-value">${lps(saldos.LPS)}</div></div>
+      <div><div class="stat-label">Saldo disponible (USD)</div><div class="stat-value">${money(saldos.USD)}</div></div>
+    </div>
+    <div class="cfg-hint">Parte de la ganancia acumulada de todos los paquetes, menos lo que ya se ha retirado</div>
+    ${f ? `
+      <div class="subcard">
+        <div class="form-grid">
+          <div class="field"><label>Fecha</label><input type="date" value="${esc(f.fecha)}" onchange="setCajaField('fecha',this.value)" /></div>
+          <div class="field"><label>Tipo</label>
+            <select onchange="setCajaField('tipo',this.value)">
+              <option value="salida" ${f.tipo === "salida" ? "selected" : ""}>Salida (se agarró dinero)</option>
+              <option value="entrada" ${f.tipo === "entrada" ? "selected" : ""}>Entrada (se metió dinero)</option>
+            </select>
+          </div>
+          <div class="field"><label>Moneda</label>
+            <select onchange="setCajaField('moneda',this.value)">
+              <option value="LPS" ${f.moneda === "LPS" ? "selected" : ""}>Lempiras (L)</option>
+              <option value="USD" ${f.moneda === "USD" ? "selected" : ""}>Dólares ($)</option>
+            </select>
+          </div>
+          <div class="field"><label>Monto</label><input type="number" step="0.01" value="${esc(f.monto)}" onchange="setCajaField('monto',this.value)" /></div>
+          <div class="field" style="grid-column:span 2;"><label>¿En qué se usó / de dónde vino?</label><input value="${esc(f.motivo)}" onchange="setCajaField('motivo',this.value)" placeholder="Ej: gasolina, se metieron los $68 de Lineth..." /></div>
+        </div>
+        <div class="form-actions">
+          <button class="btn secondary" onclick="closeCajaForm()">Cancelar</button>
+          <button class="btn" onclick="saveCajaForm()">Guardar</button>
+        </div>
+      </div>
+    ` : `<button class="btn secondary" style="margin:14px 0;" onclick="openNewCaja()">+ Registrar movimiento</button>`}
+    <div class="table-wrap"><table>
+      <thead><tr><th>Fecha</th><th>Tipo</th><th class="num">Monto</th><th>Motivo</th><th></th></tr></thead>
+      <tbody>
+        ${state.caja.map(m => `
+          <tr>
+            <td class="mono">${esc(m.fecha) || "—"}</td>
+            <td style="color:${m.tipo === 'entrada' ? 'var(--teal)' : 'var(--rust)'}">${m.tipo === 'entrada' ? 'Entrada' : 'Salida'}</td>
+            <td class="num">${m.moneda === 'USD' ? money(m.monto) : lps(m.monto)}</td>
+            <td>${esc(m.motivo) || "—"}</td>
+            <td>
+              ${state.confirmDeleteCaja === m.id
+                ? `<div class="confirm-box">¿Eliminar? <button class="btn secondary" onclick="state.confirmDeleteCaja=null; render()">No</button><button class="btn" onclick="doDeleteCaja('${m.id}')">Sí</button></div>`
+                : `<div class="row-actions"><button class="icon-btn" onclick='openEditCaja(${JSON.stringify(m).replace(/'/g, "&#39;")})'>Editar</button><button class="icon-btn" onclick="state.confirmDeleteCaja='${m.id}'; render()">Borrar</button></div>`}
+            </td>
+          </tr>`).join("")}
+      </tbody>
+    </table></div>
+    ${state.caja.length === 0 ? `<div class="empty">Todavía no hay movimientos registrados.</div>` : ""}
+  </div>`;
+}
+
+// ============ RENDER: TARIFAS ============
+function renderTarifas() {
+  const cfg = state.config;
+  return `<div class="card">
+    <h3>Tarifas por tipo de envío ($/lb)</h3>
+    ${RATE_TYPES.map(t => `
+      <div class="cfg-row">
+        <div>${t}</div>
+        <div class="field"><label>Cliente</label><input type="number" step="0.01" value="${cfg.rates[t].cliente}" onchange="updateRate('${t}','cliente',this.value)" /></div>
+        <div class="field"><label>Empresa</label><input type="number" step="0.01" value="${cfg.rates[t].empresa}" onchange="updateRate('${t}','empresa',this.value)" /></div>
+      </div>`).join("")}
+    <div class="cfg-hint">Cargos fijos aplicados a cada paquete</div>
+    ${cfg.cargos.map(c => `
+      <div class="cargo-row">
+        <input value="${esc(c.label)}" onchange="updateCargo('${c.id}','label',this.value)" />
+        <input type="number" step="0.01" value="${c.monto}" onchange="updateCargo('${c.id}','monto',this.value)" />
+        <button class="icon-btn" onclick="removeCargo('${c.id}')">✕</button>
+      </div>`).join("")}
+    <button class="btn secondary" onclick="addCargo()">+ Agregar cargo</button>
+    <div class="cfg-hint">Tasa de cambio (Lempiras por dólar)</div>
+    <div style="max-width:160px;"><input type="number" step="0.01" value="${cfg.tasaCambio}" onchange="updateTasaCambio(this.value)" /></div>
+  </div>`;
+}
+
+// ============ RENDER: FACTURAS ============
 function renderFacturaBuilder() {
   const fb = state.facturaBuilder;
   const preview = fb.cliente ? calcFacturaPreview() : null;
-  return `<div class="panel">
-    <h3>Nueva factura</h3>
+  return `<div class="subcard">
+    <h3 style="font-size:14px; margin-bottom:12px;">Nueva factura</h3>
     <div class="form-grid">
       <div class="field"><label>Cliente</label>
         <select onchange="setFacturaClienteSel(this.value)">
@@ -380,17 +560,17 @@ function renderFacturaBuilder() {
       <div class="field"><label>Impuesto %</label><input type="number" step="0.01" value="${esc(fb.impuestoPct)}" onchange="setFacturaBuilderField('impuestoPct',this.value)" /></div>
     </div>
     ${fb.cliente ? `
-      <div class="cfg-hint" style="margin-top:14px;">Paquetes pendientes de facturar de ${esc(fb.cliente)}</div>
+      <div class="cfg-hint">Paquetes pendientes de facturar de ${esc(fb.cliente)}</div>
       ${paquetesPendientesDe(fb.cliente).map(p => `
         <label class="fac-check-row">
           <input type="checkbox" ${fb.seleccionados[p.id] ? "checked" : ""} onchange="toggleFacturaPaquete('${p.id}')" />
-          <span class="mono">${esc(p.fecha)}</span> — ${esc(p.descripcion)||'—'} — ${p.peso} lb — ${esc(p.tipo_envio)}
+          <span class="mono">${esc(p.fecha)}</span> — ${esc(p.descripcion) || '—'} — ${p.peso} lb — ${esc(p.tipo_envio)}
         </label>`).join("")}
       ${preview ? `
         <div class="fac-preview">
           <table>
             <thead><tr><th>Descripción</th><th class="num">Libras</th><th class="num">Precio unit.</th><th class="num">Total</th></tr></thead>
-            <tbody>${preview.items.map(i=>`<tr><td>${esc(i.descripcion)}</td><td class="num">${i.cantidad.toFixed(2)}</td><td class="num">${lps(i.precio_unitario)}</td><td class="num">${lps(i.total)}</td></tr>`).join("")}</tbody>
+            <tbody>${preview.items.map(i => `<tr><td>${esc(i.descripcion)}</td><td class="num">${i.cantidad.toFixed(2)}</td><td class="num">${lps(i.precio_unitario)}</td><td class="num">${lps(i.total)}</td></tr>`).join("")}</tbody>
           </table>
           <div style="text-align:right;">
             Subtotal: ${lps(preview.subtotal)}<br/>
@@ -409,10 +589,9 @@ function renderFacturaBuilder() {
     </div>
   </div>`;
 }
-
 function renderFacturaVista(f) {
   const e = state.empresa;
-  return `<div class="panel no-print">
+  return `<div class="no-print" style="margin-bottom:14px; display:flex; gap:8px;">
     <button class="icon-btn" onclick="cerrarVistaFactura()">← Volver</button>
     <button class="btn secondary" onclick="imprimirFactura()">Imprimir / Guardar PDF</button>
   </div>
@@ -438,14 +617,12 @@ function renderFacturaVista(f) {
     <div>${esc(f.cliente)}</div>
     <table>
       <thead><tr><th>DESCRIPCIÓN DE PRODUCTO</th><th class="num">Libras</th><th class="num">Precio Unitario</th><th class="num">TOTAL</th></tr></thead>
-      <tbody>
-        ${(f.items||[]).map(i=>`<tr><td>${esc(i.descripcion)}</td><td class="num">${Number(i.cantidad).toFixed(2)}</td><td class="num">${lps(i.precio_unitario)}</td><td class="num">${lps(i.total)}</td></tr>`).join("")}
-      </tbody>
+      <tbody>${(f.items || []).map(i => `<tr><td>${esc(i.descripcion)}</td><td class="num">${Number(i.cantidad).toFixed(2)}</td><td class="num">${lps(i.precio_unitario)}</td><td class="num">${lps(i.total)}</td></tr>`).join("")}</tbody>
     </table>
     <div style="display:flex; justify-content:space-between;">
       <div>
         <div>Para realizar los pagos envíalos a la siguiente cuenta:</div>
-        ${(e.cuentas_bancarias||[]).map(c=>`<div>${esc(c.banco)} ${esc(c.cuenta)}</div>`).join("")}
+        ${(e.cuentas_bancarias || []).map(c => `<div>${esc(c.banco)} ${esc(c.cuenta)}</div>`).join("")}
       </div>
       <div style="text-align:right;">
         <div>Subtotal: ${lps(f.subtotal)}</div>
@@ -460,11 +637,10 @@ function renderFacturaVista(f) {
     Gracias por hacer negocios con nosotros!</p>
   </div>`;
 }
-
 function renderEmpresaForm() {
   const e = state.empresa;
-  return `<div class="panel">
-    <h3>Datos de la empresa (aparecen en la factura)</h3>
+  return `<div class="subcard">
+    <h3 style="font-size:14px; margin-bottom:12px;">Datos de la empresa (aparecen en la factura)</h3>
     <div class="form-grid">
       <div class="field"><label>Nombre</label><input value="${esc(e.nombre)}" onchange="setEmpresaField('nombre',this.value)" /></div>
       <div class="field"><label>Dirección</label><input value="${esc(e.direccion)}" onchange="setEmpresaField('direccion',this.value)" /></div>
@@ -476,7 +652,7 @@ function renderEmpresaForm() {
       <div class="field"><label>Correo</label><input value="${esc(e.correo)}" onchange="setEmpresaField('correo',this.value)" /></div>
     </div>
     <div class="cfg-hint">Cuentas bancarias</div>
-    ${(e.cuentas_bancarias||[]).map((c,i)=>`
+    ${(e.cuentas_bancarias || []).map((c, i) => `
       <div class="cfg-row">
         <input placeholder="Banco" value="${esc(c.banco)}" onchange="setEmpresaCuenta(${i},'banco',this.value)" />
         <input placeholder="N° de cuenta" value="${esc(c.cuenta)}" onchange="setEmpresaCuenta(${i},'cuenta',this.value)" />
@@ -489,12 +665,11 @@ function renderEmpresaForm() {
     </div>
   </div>`;
 }
-
 function renderFacturas() {
   if (state.facturaVista) return renderFacturaVista(state.facturaVista);
-  return `<div class="panel">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-      <h3 style="margin:0;">Facturas</h3>
+  return `<div class="card">
+    <div class="card-head">
+      <h3>Facturas</h3>
       <div style="display:flex; gap:8px;">
         <button class="icon-btn" onclick="state.showEmpresaForm=!state.showEmpresaForm; render()">Datos de empresa</button>
         ${!state.facturaBuilder ? `<button class="btn" onclick="openFacturaBuilder()">+ Nueva factura</button>` : ""}
@@ -502,216 +677,37 @@ function renderFacturas() {
     </div>
     ${state.showEmpresaForm ? renderEmpresaForm() : ""}
     ${state.facturaBuilder ? renderFacturaBuilder() : ""}
-    <table>
-      <thead><tr><th>N°</th><th>Fecha</th><th>Cliente</th><th class="num">Total</th><th></th></tr></thead>
+    <div class="table-wrap"><table>
+      <thead><tr><th>N°</th><th>Fecha</th><th>Cliente</th><th class="num">Total</th><th>Estado</th><th></th></tr></thead>
       <tbody>
-        ${state.facturas.map(f=>`<tr><td class="mono">${f.numero}</td><td class="mono">${esc(f.fecha)}</td><td>${esc(f.cliente)}</td><td class="num">${lps(f.total)}</td><td><button class="icon-btn" onclick="verFactura('${f.id}')">Ver / Imprimir</button></td></tr>`).join("")}
+        ${state.facturas.map(f => `<tr><td class="mono">${f.numero}</td><td class="mono">${esc(f.fecha)}</td><td>${esc(f.cliente)}</td><td class="num">${lps(f.total)}</td><td><span class="pill">${esc(f.estado)}</span></td><td><button class="icon-btn" onclick="verFactura('${f.id}')">Ver / Imprimir</button></td></tr>`).join("")}
       </tbody>
-    </table>
-    ${state.facturas.length===0 ? `<div class="empty">No hay facturas todavía.</div>` : ""}
+    </table></div>
+    ${state.facturas.length === 0 ? `<div class="empty">No hay facturas todavía.</div>` : ""}
   </div>`;
 }
 
-function getFiltered() {
-  const q = state.query.trim().toLowerCase();
-  return state.packages
-    .filter(p => state.filterTipo === "Todos" ? true : p.tipo_envio === state.filterTipo)
-    .filter(p => !q ? true : [p.cliente, p.orden, p.tracking, p.descripcion].some(v => (v || "").toLowerCase().includes(q)));
-}
-
-function getTotals() {
-  const base = { count: 0, totalCliente: 0, ganancia: 0, gananciaLps: 0, extraLps: 0 };
-  const porTipo = {}; RATE_TYPES.forEach(t => porTipo[t] = { count: 0, ganancia: 0 });
-  state.packages.forEach(p => {
-    const c = calc(p, state.config);
-    base.count++; base.totalCliente += c.totalCliente; base.ganancia += c.ganancia; base.gananciaLps += c.gananciaLps;
-    base.extraLps += Number(p.pago_extra_lps) || 0;
-    if (porTipo[p.tipo_envio]) { porTipo[p.tipo_envio].count++; porTipo[p.tipo_envio].ganancia += c.ganancia; }
-  });
-  base.gananciaLps += base.extraLps;
-  return { ...base, porTipo };
-}
-
-function esc(s) { return (s ?? "").toString().replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m])); }
-
+// ============ RENDER PRINCIPAL ============
 function render() {
-  const t = getTotals();
-  const filtered = getFiltered();
   const app = document.getElementById("app");
+  const views = { resumen: renderResumen, paquetes: renderPaquetes, facturas: renderFacturas, caja: renderCaja, tarifas: renderTarifas };
+  const labels = { resumen: "Resumen", paquetes: "Paquetes", facturas: "Facturas", caja: "Caja chica", tarifas: "Tarifas" };
   app.innerHTML = `
     <div class="pkg-head">
       <div>
         <p class="pkg-title">Control de Paquetería</p>
         <div class="pkg-sub">Seguimiento de envíos, tarifas y márgenes</div>
       </div>
-      <div class="pkg-actions">
-        <button class="icon-btn" onclick="logout()">Cerrar sesión</button>
-        <button class="btn secondary" onclick="state.showFacturas=!state.showFacturas; state.showCaja=false; state.showConfig=false; render()">Facturas</button>
-        <button class="btn secondary" onclick="state.showCaja=!state.showCaja; state.showConfig=false; state.showFacturas=false; render()">Caja chica</button>
-        <button class="btn secondary" onclick="state.showConfig=!state.showConfig; state.showCaja=false; state.showFacturas=false; render()">Tarifas</button>
-        <button class="btn" onclick="openNew()">+ Nuevo paquete</button>
-      </div>
+      <button class="icon-btn no-print" onclick="logout()">Cerrar sesión</button>
+    </div>
+    <div class="nav no-print">
+      ${Object.keys(views).map(v => `<button class="${state.view === v ? 'active' : ''}" onclick="setView('${v}')">${labels[v]}</button>`).join("")}
     </div>
     ${state.saveError ? `<div class="banner">${esc(state.saveError)}</div>` : ""}
-    <div class="pkg-stats">
-      <div class="stat"><div class="stat-label">Paquetes</div><div class="stat-value">${t.count}</div></div>
-      <div class="stat"><div class="stat-label">Total facturado</div><div class="stat-value">${money(t.totalCliente)}</div></div>
-      <div class="stat"><div class="stat-label">Ganancia</div><div class="stat-value" style="color:var(--teal)">${money(t.ganancia)}</div></div>
-      <div class="stat"><div class="stat-label">Ganancia en Lempiras</div><div class="stat-value">${lps(t.gananciaLps)}</div>${t.extraLps ? `<div style="font-size:11px;color:var(--ink-soft);margin-top:2px;">incluye ${lps(t.extraLps)} de pagos OTP</div>` : ""}</div>
-    </div>
-    <div class="pkg-tipos">
-      ${RATE_TYPES.map(tp => `<div class="tipo-chip"><span class="dot" style="background:${TIPO_COLOR[tp]}"></span>${tp}: ${t.porTipo[tp].count} · ${money(t.porTipo[tp].ganancia)}</div>`).join("")}
-    </div>
-    ${state.showConfig ? renderConfig() : ""}
-    ${state.showCaja ? renderCaja() : ""}
-    ${state.showFacturas ? renderFacturas() : ""}
-    ${state.showForm ? renderForm() : ""}
-    <div class="toolbar">
-      <div class="search-wrap"><input placeholder="Buscar por cliente, orden, tracking o descripción" value="${esc(state.query)}" oninput="state.query=this.value; render()" /></div>
-      <select class="tipo-filter" onchange="state.filterTipo=this.value; render()">
-        <option ${state.filterTipo === "Todos" ? "selected" : ""}>Todos</option>
-        ${RATE_TYPES.map(tp => `<option ${state.filterTipo === tp ? "selected" : ""}>${tp}</option>`).join("")}
-      </select>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Fecha</th><th>Cliente</th><th>Orden</th><th>Tracking</th><th>Descripción</th><th>Tipo</th><th class="num">Peso</th><th class="num">Total</th><th class="num">Ganancia</th><th>Pago</th><th></th></tr></thead>
-        <tbody>
-          ${filtered.map(p => {
-            const c = calc(p, state.config);
-            const tracking = p.tracking ? (p.tracking.length > 16 ? esc(p.tracking.slice(0, 16)) + "…" : esc(p.tracking)) : "—";
-            return `<tr>
-              <td class="mono">${esc(p.fecha) || "—"}</td>
-              <td>${esc(p.cliente) || "—"}</td>
-              <td class="mono">${esc(p.orden) || "—"}</td>
-              <td class="mono" title="${esc(p.tracking)}">${tracking}</td>
-              <td>${esc(p.descripcion) || "—"}</td>
-              <td class="tipo-cell"><span class="dot" style="background:${TIPO_COLOR[p.tipo_envio]};display:inline-block;margin-right:6px;"></span>${esc(p.tipo_envio)}</td>
-              <td class="num">${c.tienePeso ? c.peso.toFixed(2) : "—"}</td>
-              <td class="num">${c.tienePeso ? money(c.totalCliente) : "—"}</td>
-              <td class="num ganancia-pos">${c.tienePeso ? money(c.ganancia) : "—"}</td>
-              <td>${p.nota_pago ? `<span style="color:var(--rust); font-size:12px;">${esc(p.nota_pago)}</span>` : ""}</td>
-              <td>
-                ${state.confirmDelete === p.id
-                  ? `<div class="confirm-box">¿Eliminar? <button class="btn secondary" onclick="state.confirmDelete=null; render()">No</button><button class="btn" onclick="doDelete('${p.id}')">Sí</button></div>`
-                  : `<div class="row-actions"><button class="icon-btn" onclick='openEdit(${JSON.stringify(p).replace(/'/g, "&#39;")})'>Editar</button><button class="icon-btn" onclick="state.confirmDelete='${p.id}'; render()">Borrar</button></div>`}
-              </td>
-            </tr>`;
-          }).join("")}
-        </tbody>
-      </table>
-      ${filtered.length === 0 ? `<div class="empty">No hay paquetes que coincidan con la búsqueda.</div>` : ""}
-    </div>
+    ${views[state.view]()}
   `;
 }
 
-function renderCaja() {
-  const saldos = getSaldosCaja();
-  const f = state.cajaForm;
-  return `<div class="panel">
-    <h3>Caja chica</h3>
-    <div style="display:flex; gap:24px; margin-bottom:4px;">
-      <div><div class="stat-label">Saldo disponible (LPS)</div><div class="stat-value">${lps(saldos.LPS)}</div></div>
-      <div><div class="stat-label">Saldo disponible (USD)</div><div class="stat-value">${money(saldos.USD)}</div></div>
-    </div>
-    <div class="cfg-hint" style="margin-bottom:16px;">Parte de la ganancia acumulada de todos los paquetes, menos lo que ya se ha retirado</div>
-
-    ${f ? `
-      <div style="background:#fff; border:1px solid var(--line); padding:14px; margin-bottom:16px;">
-        <div class="form-grid">
-          <div class="field"><label>Fecha</label><input type="date" value="${esc(f.fecha)}" onchange="setCajaField('fecha',this.value)" /></div>
-          <div class="field"><label>Tipo</label>
-            <select onchange="setCajaField('tipo',this.value)">
-              <option value="salida" ${f.tipo === "salida" ? "selected" : ""}>Salida (se agarró dinero)</option>
-              <option value="entrada" ${f.tipo === "entrada" ? "selected" : ""}>Entrada (se metió dinero)</option>
-            </select>
-          </div>
-          <div class="field"><label>Moneda</label>
-            <select onchange="setCajaField('moneda',this.value)">
-              <option value="LPS" ${f.moneda === "LPS" ? "selected" : ""}>Lempiras (L)</option>
-              <option value="USD" ${f.moneda === "USD" ? "selected" : ""}>Dólares ($)</option>
-            </select>
-          </div>
-          <div class="field"><label>Monto</label><input type="number" step="0.01" value="${esc(f.monto)}" onchange="setCajaField('monto',this.value)" /></div>
-          <div class="field" style="grid-column:span 2;"><label>¿En qué se usó / de dónde vino?</label><input value="${esc(f.motivo)}" onchange="setCajaField('motivo',this.value)" placeholder="Ej: gasolina, se metieron los $68 de Lineth..." /></div>
-        </div>
-        <div class="form-actions">
-          <button class="btn secondary" onclick="closeCajaForm()">Cancelar</button>
-          <button class="btn" onclick="saveCajaForm()">Guardar</button>
-        </div>
-      </div>
-    ` : `<button class="btn secondary" style="margin-bottom:14px;" onclick="openNewCaja()">+ Registrar movimiento</button>`}
-
-    <table>
-      <thead><tr><th>Fecha</th><th>Tipo</th><th class="num">Monto</th><th>Motivo</th><th></th></tr></thead>
-      <tbody>
-        ${state.caja.map(m => `
-          <tr>
-            <td class="mono">${esc(m.fecha) || "—"}</td>
-            <td style="color:${m.tipo === 'entrada' ? 'var(--teal)' : 'var(--rust)'}">${m.tipo === 'entrada' ? 'Entrada' : 'Salida'}</td>
-            <td class="num">${m.moneda === 'USD' ? money(m.monto) : lps(m.monto)}</td>
-            <td>${esc(m.motivo) || "—"}</td>
-            <td>
-              ${state.confirmDeleteCaja === m.id
-                ? `<div class="confirm-box">¿Eliminar? <button class="btn secondary" onclick="state.confirmDeleteCaja=null; render()">No</button><button class="btn" onclick="doDeleteCaja('${m.id}')">Sí</button></div>`
-                : `<div class="row-actions"><button class="icon-btn" onclick='openEditCaja(${JSON.stringify(m).replace(/'/g, "&#39;")})'>Editar</button><button class="icon-btn" onclick="state.confirmDeleteCaja='${m.id}'; render()">Borrar</button></div>`}
-            </td>
-          </tr>`).join("")}
-      </tbody>
-    </table>
-    ${state.caja.length === 0 ? `<div class="empty">Todavía no hay movimientos registrados.</div>` : ""}
-  </div>`;
-}
-
-function renderConfig() {
-  const cfg = state.config;
-  return `<div class="panel">
-    <h3>Tarifas por tipo de envío ($/lb)</h3>
-    ${RATE_TYPES.map(t => `
-      <div class="cfg-row">
-        <div>${t}</div>
-        <div class="field"><label>Cliente</label><input type="number" step="0.01" value="${cfg.rates[t].cliente}" onchange="updateRate('${t}','cliente',this.value)" /></div>
-        <div class="field"><label>Empresa</label><input type="number" step="0.01" value="${cfg.rates[t].empresa}" onchange="updateRate('${t}','empresa',this.value)" /></div>
-      </div>`).join("")}
-    <div class="cfg-hint">Cargos fijos aplicados a cada paquete</div>
-    ${cfg.cargos.map(c => `
-      <div class="cargo-row">
-        <input value="${esc(c.label)}" onchange="updateCargo('${c.id}','label',this.value)" />
-        <input type="number" step="0.01" value="${c.monto}" onchange="updateCargo('${c.id}','monto',this.value)" />
-        <button class="icon-btn" onclick="removeCargo('${c.id}')">✕</button>
-      </div>`).join("")}
-    <button class="btn secondary" onclick="addCargo()">+ Agregar cargo</button>
-    <div class="cfg-hint">Tasa de cambio (Lempiras por dólar)</div>
-    <div style="max-width:160px;"><input type="number" step="0.01" value="${cfg.tasaCambio}" onchange="updateTasaCambio(this.value)" /></div>
-  </div>`;
-}
-
-function renderForm() {
-  const f = state.form;
-  return `<div class="panel">
-    <h3>${f.id ? "Editar paquete" : "Nuevo paquete"}</h3>
-    <div class="form-grid">
-      <div class="field"><label>Fecha</label><input type="date" value="${esc(f.fecha)}" onchange="setField('fecha',this.value)" /></div>
-      <div class="field"><label>Cliente</label><input value="${esc(f.cliente)}" onchange="setField('cliente',this.value)" /></div>
-      <div class="field"><label>Orden #</label><input value="${esc(f.orden)}" onchange="setField('orden',this.value)" /></div>
-      <div class="field"><label>Tracking #</label><input value="${esc(f.tracking)}" onchange="setField('tracking',this.value)" /></div>
-      <div class="field" style="grid-column:span 2;"><label>Descripción</label><input value="${esc(f.descripcion)}" onchange="setField('descripcion',this.value)" /></div>
-      <div class="field"><label>Tipo de envío</label>
-        <select onchange="setField('tipo_envio',this.value)">
-          ${RATE_TYPES.map(t => `<option ${f.tipo_envio === t ? "selected" : ""}>${t}</option>`).join("")}
-        </select>
-      </div>
-      <div class="field"><label>Peso (lb)</label><input type="number" step="0.01" value="${esc(f.peso)}" onchange="setField('peso',this.value)" placeholder="Opcional" /></div>
-      <div class="field" style="grid-column:span 2;"><label>Nota de pago</label><input value="${esc(f.nota_pago)}" onchange="setField('nota_pago',this.value)" placeholder="Ej: No se pagó, Pago OTP..." /></div>
-    </div>
-    <div class="form-actions">
-      <button class="btn secondary" onclick="closeForm()">Cancelar</button>
-      <button class="btn" onclick="saveForm()">Guardar</button>
-    </div>
-  </div>`;
-}
-
-// Restaurar sesión si ya había una activa
 supa.auth.getSession().then(({ data }) => {
   if (data.session) {
     state.user = data.session.user;
