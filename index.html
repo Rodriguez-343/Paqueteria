@@ -146,8 +146,12 @@ function lps(n) { return "L " + (Number(n) || 0).toFixed(2); }
 function esc(s) { return (s ?? "").toString().replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m])); }
 
 function calc(pkg, config) {
-  const rate = config.rates[pkg.tipo_envio] || { cliente: 0, empresa: 0 };
-  const cargoFijo = config.cargos.reduce((s, c) => s + (Number(c.monto) || 0), 0);
+  const rateGlobal = config.rates[pkg.tipo_envio] || { cliente: 0, empresa: 0 };
+  const rate = {
+    cliente: pkg.tarifa_cliente !== null && pkg.tarifa_cliente !== undefined ? Number(pkg.tarifa_cliente) : rateGlobal.cliente,
+    empresa: pkg.tarifa_empresa !== null && pkg.tarifa_empresa !== undefined ? Number(pkg.tarifa_empresa) : rateGlobal.empresa,
+  };
+  const cargoFijo = pkg.cargo_fijo !== null && pkg.cargo_fijo !== undefined ? Number(pkg.cargo_fijo) : config.cargos.reduce((s, c) => s + (Number(c.monto) || 0), 0);
   const tienePeso = pkg.peso !== "" && pkg.peso !== null && pkg.peso !== undefined && !isNaN(Number(pkg.peso));
   const peso = tienePeso ? Number(pkg.peso) : 0;
   const flete = peso * rate.cliente;
@@ -209,8 +213,13 @@ async function saveForm() {
   const f = state.form;
   const clean = { fecha: f.fecha || null, cliente: f.cliente, orden: f.orden, tracking: f.tracking, descripcion: f.descripcion, tipo_envio: f.tipo_envio, peso: f.peso === "" ? null : Number(f.peso), nota_pago: f.nota_pago || null };
   let error;
-  if (f.id) ({ error } = await supa.from("paquetes").update(clean).eq("id", f.id));
-  else ({ error } = await supa.from("paquetes").insert({ ...clean, user_id: state.user.id }));
+  if (f.id) {
+    ({ error } = await supa.from("paquetes").update(clean).eq("id", f.id));
+  } else {
+    const rate = state.config.rates[f.tipo_envio] || { cliente: 0, empresa: 0 };
+    const cargoFijo = state.config.cargos.reduce((s, c) => s + (Number(c.monto) || 0), 0);
+    ({ error } = await supa.from("paquetes").insert({ ...clean, user_id: state.user.id, tarifa_cliente: rate.cliente, tarifa_empresa: rate.empresa, cargo_fijo: cargoFijo }));
+  }
   state.saveError = error ? "No se pudo guardar el paquete." : null;
   state.form = null;
   await loadData();
