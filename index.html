@@ -159,7 +159,8 @@ function calc(pkg, config) {
   const totalCliente = flete + cargoFijo;
   const costoEmpresa = costoFlete + cargoFijo;
   const ganancia = totalCliente - costoEmpresa;
-  return { tienePeso, peso, flete, cargoFijo, totalCliente, costoEmpresa, ganancia, gananciaLps: ganancia * config.tasaCambio };
+  const tasa = pkg.tasa_cambio !== null && pkg.tasa_cambio !== undefined ? Number(pkg.tasa_cambio) : config.tasaCambio;
+  return { tienePeso, peso, flete, cargoFijo, totalCliente, costoEmpresa, ganancia, gananciaLps: ganancia * tasa };
 }
 
 function emptyForm() {
@@ -218,7 +219,7 @@ async function saveForm() {
   } else {
     const rate = state.config.rates[f.tipo_envio] || { cliente: 0, empresa: 0 };
     const cargoFijo = state.config.cargos.reduce((s, c) => s + (Number(c.monto) || 0), 0);
-    ({ error } = await supa.from("paquetes").insert({ ...clean, user_id: state.user.id, tarifa_cliente: rate.cliente, tarifa_empresa: rate.empresa, cargo_fijo: cargoFijo }));
+    ({ error } = await supa.from("paquetes").insert({ ...clean, user_id: state.user.id, tarifa_cliente: rate.cliente, tarifa_empresa: rate.empresa, cargo_fijo: cargoFijo, tasa_cambio: state.config.tasaCambio }));
   }
   state.saveError = error ? "No se pudo guardar el paquete." : null;
   state.form = null;
@@ -298,6 +299,24 @@ function updateCargo(id, field, value) {
 function addCargo() { persistConfig({ ...state.config, cargos: [...state.config.cargos, { id: "c" + Date.now(), label: "Nuevo cargo", monto: 0 }] }); }
 function removeCargo(id) { persistConfig({ ...state.config, cargos: state.config.cargos.filter(c => c.id !== id) }); }
 function updateTasaCambio(v) { persistConfig({ ...state.config, tasaCambio: Number(v) || 0 }); }
+async function actualizarTasaHoy() {
+  state.tasaLoading = true; render();
+  try {
+    const res = await fetch("https://open.er-api.com/v6/latest/USD");
+    const data = await res.json();
+    const hnl = data?.rates?.HNL;
+    if (hnl) {
+      await persistConfig({ ...state.config, tasaCambio: Number(hnl.toFixed(4)) });
+      state.saveError = null;
+    } else {
+      state.saveError = "No se pudo leer la tasa HNL de la respuesta.";
+    }
+  } catch (e) {
+    state.saveError = "No se pudo conectar para obtener la tasa de hoy.";
+  }
+  state.tasaLoading = false;
+  render();
+}
 
 // ---------- FACTURACIÓN ----------
 function clientesPendientes() {
@@ -547,8 +566,11 @@ function renderTarifas() {
         <button class="icon-btn" onclick="removeCargo('${c.id}')">✕</button>
       </div>`).join("")}
     <button class="btn secondary" onclick="addCargo()">+ Agregar cargo</button>
-    <div class="cfg-hint">Tasa de cambio (Lempiras por dólar)</div>
-    <div style="max-width:160px;"><input type="number" step="0.01" value="${cfg.tasaCambio}" onchange="updateTasaCambio(this.value)" /></div>
+    <div class="cfg-hint">Tasa de cambio (Lempiras por dólar) — cada paquete nuevo guarda la tasa vigente en ese momento</div>
+    <div style="display:flex; gap:8px; align-items:center; max-width:320px;">
+      <input type="number" step="0.0001" value="${cfg.tasaCambio}" onchange="updateTasaCambio(this.value)" style="flex:1;" />
+      <button class="btn secondary" onclick="actualizarTasaHoy()" ${state.tasaLoading ? "disabled" : ""}>${state.tasaLoading ? "Consultando..." : "Actualizar tasa de hoy"}</button>
+    </div>
   </div>`;
 }
 
