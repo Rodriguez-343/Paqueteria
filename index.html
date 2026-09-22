@@ -164,7 +164,7 @@ function calc(pkg, config) {
 }
 
 function emptyForm() {
-  return { id: null, fecha: new Date().toISOString().slice(0, 10), cliente: "", orden: "", tracking: "", descripcion: "", tipo_envio: "Aéreo Express", peso: "", nota_pago: "" };
+  return { id: null, fecha: new Date().toISOString().slice(0, 10), cliente: "", casillero: "", orden: "", tracking: "", descripcion: "", tipo_envio: "Aéreo Express", peso: "", nota_pago: "" };
 }
 
 function setView(v) { state.view = v; render(); }
@@ -212,7 +212,7 @@ async function persistConfig(next) {
 
 async function saveForm() {
   const f = state.form;
-  const clean = { fecha: f.fecha || null, cliente: f.cliente, orden: f.orden, tracking: f.tracking, descripcion: f.descripcion, tipo_envio: f.tipo_envio, peso: f.peso === "" ? null : Number(f.peso), nota_pago: f.nota_pago || null };
+  const clean = { fecha: f.fecha || null, cliente: f.cliente, casillero: f.casillero || null, orden: f.orden, tracking: f.tracking, descripcion: f.descripcion, tipo_envio: f.tipo_envio, peso: f.peso === "" ? null : Number(f.peso), nota_pago: f.nota_pago || null };
   let error;
   if (f.id) {
     ({ error } = await supa.from("paquetes").update(clean).eq("id", f.id));
@@ -232,7 +232,7 @@ async function doDelete(id) {
   await loadData();
 }
 function openNew() { state.form = emptyForm(); render(); }
-function openEdit(p) { state.form = { ...p, peso: p.peso === null || p.peso === undefined ? "" : String(p.peso), nota_pago: p.nota_pago || "" }; render(); }
+function openEdit(p) { state.form = { ...p, peso: p.peso === null || p.peso === undefined ? "" : String(p.peso), nota_pago: p.nota_pago || "", casillero: p.casillero || "" }; render(); }
 function closeForm() { state.form = null; render(); }
 function setField(k, v) { state.form[k] = v; }
 
@@ -240,7 +240,7 @@ function getFiltered() {
   const q = state.query.trim().toLowerCase();
   return state.packages
     .filter(p => state.filterTipo === "Todos" ? true : p.tipo_envio === state.filterTipo)
-    .filter(p => !q ? true : [p.cliente, p.orden, p.tracking, p.descripcion].some(v => (v || "").toLowerCase().includes(q)));
+    .filter(p => !q ? true : [p.cliente, p.casillero, p.orden, p.tracking, p.descripcion].some(v => (v || "").toLowerCase().includes(q)));
 }
 function estadoPaquete(p) {
   if (!p.factura_id) return { label: "Sin facturar", color: "var(--ink-soft)" };
@@ -452,7 +452,7 @@ function renderResumen() {
 function renderPaquetesTable(list) {
   return `<div class="table-wrap">
     <table>
-      <thead><tr><th>Fecha</th><th>Cliente</th><th>Orden</th><th>Tracking</th><th>Descripción</th><th>Tipo</th><th class="num">Peso</th><th class="num">Total</th><th class="num">Ganancia</th><th>Pago</th><th>Estado</th><th></th></tr></thead>
+      <thead><tr><th>Fecha</th><th>Cliente</th><th>Casillero</th><th>Orden</th><th>Tracking</th><th>Descripción</th><th>Tipo</th><th class="num">Peso</th><th class="num">Total</th><th class="num">Ganancia</th><th>Pago</th><th>Estado</th><th></th></tr></thead>
       <tbody>
         ${list.map(p => {
           const c = calc(p, state.config);
@@ -461,6 +461,7 @@ function renderPaquetesTable(list) {
           return `<tr>
             <td class="mono">${esc(p.fecha) || "—"}</td>
             <td>${esc(p.cliente) || "—"}</td>
+            <td class="mono">${esc(p.casillero) || "—"}</td>
             <td class="mono">${esc(p.orden) || "—"}</td>
             <td class="mono" title="${esc(p.tracking)}">${tracking}</td>
             <td>${esc(p.descripcion) || "—"}</td>
@@ -492,6 +493,7 @@ function renderForm() {
     <div class="form-grid">
       <div class="field"><label>Fecha</label><input type="date" value="${esc(f.fecha)}" onchange="setField('fecha',this.value)" /></div>
       <div class="field"><label>Cliente</label><input value="${esc(f.cliente)}" onchange="setField('cliente',this.value)" /></div>
+      <div class="field"><label>Casillero</label><input value="${esc(f.casillero)}" onchange="setField('casillero',this.value)" placeholder="Ej: HNJ2766" /></div>
       <div class="field"><label>Orden #</label><input value="${esc(f.orden)}" onchange="setField('orden',this.value)" /></div>
       <div class="field"><label>Tracking #</label><input value="${esc(f.tracking)}" onchange="setField('tracking',this.value)" /></div>
       <div class="field" style="grid-column:span 2;"><label>Descripción</label><input value="${esc(f.descripcion)}" onchange="setField('descripcion',this.value)" /></div>
