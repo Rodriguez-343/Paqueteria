@@ -242,6 +242,19 @@ function getFiltered() {
     .filter(p => state.filterTipo === "Todos" ? true : p.tipo_envio === state.filterTipo)
     .filter(p => !q ? true : [p.cliente, p.orden, p.tracking, p.descripcion].some(v => (v || "").toLowerCase().includes(q)));
 }
+function estadoPaquete(p) {
+  if (!p.factura_id) return { label: "Sin facturar", color: "var(--ink-soft)" };
+  const f = state.facturas.find(x => x.id === p.factura_id);
+  if (!f) return { label: "Facturado", color: "var(--gold)" };
+  if (f.estado === "pagada") return { label: "Pagado", color: "var(--teal)" };
+  if (f.estado === "anulada") return { label: "Anulada", color: "var(--rust)" };
+  return { label: "Facturado", color: "var(--gold)" };
+}
+function facturarUno(p) {
+  state.view = "facturas";
+  state.facturaBuilder = { cliente: p.cliente, seleccionados: { [p.id]: true }, diasValidez: 8, impuestoPct: 0, descuento: 0 };
+  render();
+}
 function getTotals() {
   const base = { count: 0, totalCliente: 0, ganancia: 0, gananciaLps: 0, extraLps: 0 };
   const porTipo = {}; RATE_TYPES.forEach(t => porTipo[t] = { count: 0, ganancia: 0 });
@@ -381,6 +394,17 @@ async function guardarFactura() {
   await loadData();
 }
 function verFactura(id) { state.facturaVista = state.facturas.find(f => f.id === id); render(); }
+async function marcarFacturaPagada(id) {
+  const { error } = await supa.from("facturas_paqueteria").update({ estado: "pagada" }).eq("id", id);
+  state.saveError = error ? "No se pudo actualizar la factura." : null;
+  await loadData();
+}
+async function anularFacturaPaqueteria(id) {
+  const { error } = await supa.from("facturas_paqueteria").update({ estado: "anulada" }).eq("id", id);
+  state.saveError = error ? "No se pudo anular la factura." : null;
+  state.confirmDelete = null;
+  await loadData();
+}
 function cerrarVistaFactura() { state.facturaVista = null; render(); }
 function imprimirFactura() { window.print(); }
 function setEmpresaField(k, v) { state.empresa[k] = v; }
@@ -400,12 +424,19 @@ async function guardarEmpresa() {
 // ============ RENDER: RESUMEN ============
 function renderResumen() {
   const t = getTotals();
+  const facturadoLps = state.facturas.filter(f => f.estado !== "anulada").reduce((s, f) => s + Number(f.total || 0), 0);
+  const cobradoLps = state.facturas.filter(f => f.estado === "pagada").reduce((s, f) => s + Number(f.total || 0), 0);
   return `
     <div class="pkg-stats">
       <div class="stat"><div class="stat-label">Paquetes</div><div class="stat-value">${t.count}</div></div>
       <div class="stat"><div class="stat-label">Total facturado</div><div class="stat-value">${money(t.totalCliente)}</div></div>
       <div class="stat"><div class="stat-label">Ganancia</div><div class="stat-value" style="color:var(--teal)">${money(t.ganancia)}</div></div>
       <div class="stat"><div class="stat-label">Ganancia en Lempiras</div><div class="stat-value">${lps(t.gananciaLps)}</div>${t.extraLps ? `<div style="font-size:11px;color:var(--ink-soft);margin-top:2px;">incluye ${lps(t.extraLps)} de pagos OTP</div>` : ""}</div>
+    </div>
+    <div class="pkg-stats">
+      <div class="stat"><div class="stat-label">Facturado (Lps)</div><div class="stat-value">${lps(facturadoLps)}</div></div>
+      <div class="stat"><div class="stat-label">Cobrado (Lps)</div><div class="stat-value" style="color:var(--teal)">${lps(cobradoLps)}</div></div>
+      <div class="stat"><div class="stat-label">Pendiente de cobro (Lps)</div><div class="stat-value" style="color:var(--gold)">${lps(facturadoLps - cobradoLps)}</div></div>
     </div>
     <div class="pkg-tipos">
       ${RATE_TYPES.map(tp => `<div class="tipo-chip"><span class="dot" style="background:${TIPO_COLOR[tp]}"></span>${tp}: ${t.porTipo[tp].count} · ${money(t.porTipo[tp].ganancia)}</div>`).join("")}
@@ -421,10 +452,11 @@ function renderResumen() {
 function renderPaquetesTable(list) {
   return `<div class="table-wrap">
     <table>
-      <thead><tr><th>Fecha</th><th>Cliente</th><th>Orden</th><th>Tracking</th><th>Descripción</th><th>Tipo</th><th class="num">Peso</th><th class="num">Total</th><th class="num">Ganancia</th><th>Pago</th><th></th></tr></thead>
+      <thead><tr><th>Fecha</th><th>Cliente</th><th>Orden</th><th>Tracking</th><th>Descripción</th><th>Tipo</th><th class="num">Peso</th><th class="num">Total</th><th class="num">Ganancia</th><th>Pago</th><th>Estado</th><th></th></tr></thead>
       <tbody>
         ${list.map(p => {
           const c = calc(p, state.config);
+          const est = estadoPaquete(p);
           const tracking = p.tracking ? (p.tracking.length > 16 ? esc(p.tracking.slice(0, 16)) + "…" : esc(p.tracking)) : "—";
           return `<tr>
             <td class="mono">${esc(p.fecha) || "—"}</td>
@@ -437,10 +469,14 @@ function renderPaquetesTable(list) {
             <td class="num">${c.tienePeso ? money(c.totalCliente) : "—"}</td>
             <td class="num ganancia-pos">${c.tienePeso ? money(c.ganancia) : "—"}</td>
             <td>${p.nota_pago ? `<span style="color:var(--rust); font-size:12px;">${esc(p.nota_pago)}</span>` : ""}</td>
+            <td><span style="color:${est.color}; font-size:12px; font-weight:600;">${est.label}</span></td>
             <td>
               ${state.confirmDelete === p.id
                 ? `<div class="confirm-box">¿Eliminar? <button class="btn secondary" onclick="state.confirmDelete=null; render()">No</button><button class="btn" onclick="doDelete('${p.id}')">Sí</button></div>`
-                : `<div class="row-actions"><button class="icon-btn" onclick='openEdit(${JSON.stringify(p).replace(/'/g, "&#39;")})'>Editar</button><button class="icon-btn" onclick="state.confirmDelete='${p.id}'; render()">Borrar</button></div>`}
+                : `<div class="row-actions">
+                    ${!p.factura_id && c.tienePeso ? `<button class="icon-btn" onclick='facturarUno(${JSON.stringify(p).replace(/'/g, "&#39;")})'>Facturar</button>` : ""}
+                    <button class="icon-btn" onclick='openEdit(${JSON.stringify(p).replace(/'/g, "&#39;")})'>Editar</button><button class="icon-btn" onclick="state.confirmDelete='${p.id}'; render()">Borrar</button>
+                  </div>`}
             </td>
           </tr>`;
         }).join("")}
@@ -622,9 +658,11 @@ function renderFacturaBuilder() {
 }
 function renderFacturaVista(f) {
   const e = state.empresa;
-  return `<div class="no-print" style="margin-bottom:14px; display:flex; gap:8px;">
+  const textoWhatsapp = encodeURIComponent(`Hola ${f.cliente}, te comparto tu factura #${f.numero} de ${e.nombre} por un total de ${lps(f.total)}. Válida hasta ${f.fecha_limite || f.valido_hasta}.`);
+  return `<div class="no-print" style="margin-bottom:14px; display:flex; gap:8px; flex-wrap:wrap;">
     <button class="icon-btn" onclick="cerrarVistaFactura()">← Volver</button>
     <button class="btn secondary" onclick="imprimirFactura()">Imprimir / Guardar PDF</button>
+    <a class="btn secondary" style="text-decoration:none;" href="https://wa.me/?text=${textoWhatsapp}" target="_blank">Enviar por WhatsApp</a>
   </div>
   <div id="invoice-area" class="invoice-print">
     <div style="display:flex; justify-content:space-between;">
@@ -698,6 +736,9 @@ function renderEmpresaForm() {
 }
 function renderFacturas() {
   if (state.facturaVista) return renderFacturaVista(state.facturaVista);
+  const facturadoLps = state.facturas.filter(f => f.estado !== "anulada").reduce((s, f) => s + Number(f.total || 0), 0);
+  const cobradoLps = state.facturas.filter(f => f.estado === "pagada").reduce((s, f) => s + Number(f.total || 0), 0);
+  const pendienteLps = facturadoLps - cobradoLps;
   return `<div class="card">
     <div class="card-head">
       <h3>Facturas</h3>
@@ -706,12 +747,29 @@ function renderFacturas() {
         ${!state.facturaBuilder ? `<button class="btn" onclick="openFacturaBuilder()">+ Nueva factura</button>` : ""}
       </div>
     </div>
+    <div class="pkg-stats" style="margin-bottom:18px;">
+      <div class="stat"><div class="stat-label">Facturado</div><div class="stat-value">${lps(facturadoLps)}</div></div>
+      <div class="stat"><div class="stat-label">Cobrado</div><div class="stat-value" style="color:var(--teal)">${lps(cobradoLps)}</div></div>
+      <div class="stat"><div class="stat-label">Pendiente de cobro</div><div class="stat-value" style="color:var(--gold)">${lps(pendienteLps)}</div></div>
+    </div>
     ${state.showEmpresaForm ? renderEmpresaForm() : ""}
     ${state.facturaBuilder ? renderFacturaBuilder() : ""}
     <div class="table-wrap"><table>
       <thead><tr><th>N°</th><th>Fecha</th><th>Cliente</th><th class="num">Total</th><th>Estado</th><th></th></tr></thead>
       <tbody>
-        ${state.facturas.map(f => `<tr><td class="mono">${f.numero}</td><td class="mono">${esc(f.fecha)}</td><td>${esc(f.cliente)}</td><td class="num">${lps(f.total)}</td><td><span class="pill">${esc(f.estado)}</span></td><td><button class="icon-btn" onclick="verFactura('${f.id}')">Ver / Imprimir</button></td></tr>`).join("")}
+        ${state.facturas.map(f => `<tr>
+          <td class="mono">${f.numero}</td><td class="mono">${esc(f.fecha)}</td><td>${esc(f.cliente)}</td><td class="num">${lps(f.total)}</td>
+          <td><span class="pill" style="background:${f.estado==='pagada'?'#DCEFE9':f.estado==='anulada'?'#F7E3DD':'#FCEFD8'}; color:${f.estado==='pagada'?'var(--teal)':f.estado==='anulada'?'var(--rust)':'var(--gold)'};">${esc(f.estado)}</span></td>
+          <td>
+            ${state.confirmDelete === 'fact-' + f.id
+              ? `<div class="confirm-box">¿Anular? <button class="btn secondary" onclick="state.confirmDelete=null; render()">No</button><button class="btn" onclick="anularFacturaPaqueteria('${f.id}')">Sí</button></div>`
+              : `<div class="row-actions">
+                  <button class="icon-btn" onclick="verFactura('${f.id}')">Ver / Imprimir</button>
+                  ${f.estado === 'pendiente' ? `<button class="icon-btn" onclick="marcarFacturaPagada('${f.id}')">Marcar pagada</button>` : ""}
+                  ${f.estado !== 'anulada' ? `<button class="icon-btn" onclick="state.confirmDelete='fact-${f.id}'; render()">Anular</button>` : ""}
+                </div>`}
+          </td>
+        </tr>`).join("")}
       </tbody>
     </table></div>
     ${state.facturas.length === 0 ? `<div class="empty">No hay facturas todavía.</div>` : ""}
