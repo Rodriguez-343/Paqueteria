@@ -243,6 +243,7 @@ function getFiltered() {
     .filter(p => !q ? true : [p.cliente, p.casillero, p.orden, p.tracking, p.descripcion].some(v => (v || "").toLowerCase().includes(q)));
 }
 function estadoPaquete(p) {
+  if (p.facturado_externo && !p.factura_id) return { label: "Ya cobrado (histórico)", color: "var(--ink-soft)" };
   if (!p.factura_id) return { label: "Sin facturar", color: "var(--ink-soft)" };
   const f = state.facturas.find(x => x.id === p.factura_id);
   if (!f) return { label: "Facturado", color: "var(--gold)" };
@@ -334,11 +335,11 @@ async function actualizarTasaHoy() {
 // ---------- FACTURACIÓN ----------
 function clientesPendientes() {
   const set = new Set();
-  state.packages.forEach(p => { if (!p.factura_id && p.cliente && p.peso !== null && p.peso !== undefined && p.peso !== "") set.add(p.cliente); });
+  state.packages.forEach(p => { if (!p.factura_id && !p.facturado_externo && p.cliente && p.peso !== null && p.peso !== undefined && p.peso !== "") set.add(p.cliente); });
   return [...set].sort();
 }
 function paquetesPendientesDe(cliente) {
-  return state.packages.filter(p => p.cliente === cliente && !p.factura_id && p.peso !== null && p.peso !== undefined && p.peso !== "");
+  return state.packages.filter(p => p.cliente === cliente && !p.factura_id && !p.facturado_externo && p.peso !== null && p.peso !== undefined && p.peso !== "");
 }
 function openFacturaBuilder() { state.facturaBuilder = { cliente: "", seleccionados: {}, diasValidez: 8, impuestoPct: 0, descuento: 0 }; render(); }
 function closeFacturaBuilder() { state.facturaBuilder = null; render(); }
@@ -475,7 +476,7 @@ function renderPaquetesTable(list) {
               ${state.confirmDelete === p.id
                 ? `<div class="confirm-box">¿Eliminar? <button class="btn secondary" onclick="state.confirmDelete=null; render()">No</button><button class="btn" onclick="doDelete('${p.id}')">Sí</button></div>`
                 : `<div class="row-actions">
-                    ${!p.factura_id && c.tienePeso ? `<button class="icon-btn" onclick='facturarUno(${JSON.stringify(p).replace(/'/g, "&#39;")})'>Facturar</button>` : ""}
+                    ${!p.factura_id && !p.facturado_externo && c.tienePeso ? `<button class="icon-btn" onclick='facturarUno(${JSON.stringify(p).replace(/'/g, "&#39;")})'>Facturar</button>` : ""}
                     <button class="icon-btn" onclick='openEdit(${JSON.stringify(p).replace(/'/g, "&#39;")})'>Editar</button><button class="icon-btn" onclick="state.confirmDelete='${p.id}'; render()">Borrar</button>
                   </div>`}
             </td>
